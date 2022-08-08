@@ -23,8 +23,6 @@ def create_app(test_config=None):
         return config.Settings()
     setting=get_settings()
 
-    setting.SECRET_TOKEN_WEBHOOK.encode()
-
     # create app
     app = Flask(__name__)
     app.config['START_TIME'] = time.time()
@@ -41,12 +39,12 @@ def create_app(test_config=None):
 
     # Verifies token from webhook 
     def verify_signature(req):
-        x_hub_signature = req.headers.get('X-Hub-Signature')
-        hash_algorithm, github_signature = x_hub_signature.split('=', 1)
-        algorithm = hashlib.__dict__.get(hash_algorithm)
-        encoded_key = bytes(setting.SECRET_TOKEN_WEBHOOK, 'latin-1')
-        mac = hmac.new(encoded_key, msg=req.data, digestmod=algorithm)
-        return hmac.compare_digest(mac.hexdigest(), github_signature)
+        signature = "sha256="+hmac.new(
+                bytes(setting.SECRET_TOKEN_WEBHOOK, 'utf-8'),
+                msg = req.data,
+                digestmod = hashlib.sha256
+                ).hexdigest().lower()
+        return hmac.compare_digest(signature, req.headers['X-Hub-Signature-256'])
 
     @app.route('/webhook', methods=['POST'])
     def webhook():
@@ -60,6 +58,8 @@ def create_app(test_config=None):
                 return 'Forbidden', 403
         else:
             return 'Not allowed', 405
+
+    
 
     return app
 
