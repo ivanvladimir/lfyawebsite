@@ -6,10 +6,10 @@ app = Flask(__name__)
 @app.route('/webhook', methods=['POST'])
 def webhook():
     if request.method == 'POST':
-        repo = git.Repo('./myproject')
+        info=request.get_json()
+        repo = git.Repo(info["repository"]['html_url'])
         origin = repo.remotes.origin
-        repo.create_head('master',
-    origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
+        repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
         origin.pull()
         return '', 200
     else:
