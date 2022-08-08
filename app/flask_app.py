@@ -59,10 +59,6 @@ def create_app(test_config=None):
         else:
             return 'Not allowed', 405
 
-    
-    @app.route('/w', methods=['GET'])
-    def w():
-        return setting.SECRET_TOKEN_WEBHOOK 
 
     return app
 
