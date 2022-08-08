@@ -9,8 +9,7 @@ def webhook():
         info=request.get_json()
         repo = git.Repo("./lfyawebsite")
         origin = repo.remotes.origin
-        repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
         origin.pull()
-        return '', 200
+        return 'Updated successfull', 200
     else:
         return '', 400
