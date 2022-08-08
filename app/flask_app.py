@@ -23,6 +23,8 @@ def create_app(test_config=None):
         return config.Settings()
     setting=get_settings()
 
+    setting.SECRET_TOKEN_WEBHOOK.encode()
+
     # create app
     app = Flask(__name__)
     app.config['START_TIME'] = time.time()
