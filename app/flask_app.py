@@ -19,7 +19,7 @@ def create_app(test_config=None):
 
     def verify_signature(req):
         received_sign = req.headers.get('X-Hub-Signature-256').split('sha256=')[-1].strip()
-        secret = setting['SECRET_TOKEN_WEBHOOK'].encode()
+        secret = setting.SECRET_TOKEN_WEBHOOK.encode()
         expected_sign = HMAC(key=secret, msg=req.data, digestmod=sha256).hexdigest()
         return compare_digest(received_sign, expected_sign)
 
