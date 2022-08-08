@@ -7,7 +7,7 @@ app = Flask(__name__)
 def webhook():
     if request.method == 'POST':
         info=request.get_json()
-        repo = git.Repo(info["repository"]['html_url'])
+        repo = git.Repo("./lfyawebsite")
         origin = repo.remotes.origin
         repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
         origin.pull()
