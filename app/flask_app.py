@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
-from hmac import HMAC, compare_digest
-from hashlib import sha256
+import hmac
+import hashlib
 from functools import lru_cache
 from html import escape
 import git
@@ -41,10 +41,12 @@ def create_app(test_config=None):
 
     # Verifies token from webhook 
     def verify_signature(req):
-        received_sign = req.headers.get('X-Hub-Signature-256').split('sha256=')[-1].strip()
-        secret = setting.SECRET_TOKEN_WEBHOOK.encode()
-        expected_sign = HMAC(key=secret, msg=req.data, digestmod=sha256).hexdigest()
-        return compare_digest(received_sign, expected_sign)
+        x_hub_signature = req.headers.get('X-Hub-Signature')
+        hash_algorithm, github_signature = x_hub_signature.split('=', 1)
+        algorithm = hashlib.__dict__.get(hash_algorithm)
+        encoded_key = bytes(setting.SECRET_TOKEN_WEBHOOK, 'latin-1')
+        mac = hmac.new(encoded_key, msg=req.data, digestmod=algorithm)
+        return hmac.compare_digest(mac.hexdigest(), github_signature)
 
     @app.route('/webhook', methods=['POST'])
     def webhook():
