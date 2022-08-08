@@ -1,12 +1,21 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from hmac import HMAC, compare_digest
 from hashlib import sha256
 from functools import lru_cache
 from html import escape
 import git
 import time
+import subprocess
+
+
+__VERSION__ = "0.1.0"
+__APP_NAME__= "Lenguajes Formales y Autómatas"
+
 
 def create_app(test_config=None):
+    """Creates the App"""
+
+
     # Arrange configuration
     from . import config
     @lru_cache()
@@ -16,7 +25,19 @@ def create_app(test_config=None):
 
     # create app
     app = Flask(__name__)
+    app.config['START_TIME'] = time.time()
+    app.config['STATUS'] = "Active"
+    app.config['__APP_NAME__'] =  __APP_NAME__
+    app.config['__VERSION__'] = __VERSION__
 
+
+    # Import Blueprints
+    from .api import api
+    from .main import main
+    app.register_blueprint(main)
+    app.register_blueprint(api,url_prefix="/api")
+
+    # Verifies token from webhook 
     def verify_signature(req):
         received_sign = req.headers.get('X-Hub-Signature-256').split('sha256=')[-1].strip()
         secret = setting.SECRET_TOKEN_WEBHOOK.encode()
@@ -35,17 +56,6 @@ def create_app(test_config=None):
                 return 'Forbidden', 403
         else:
             return 'Not allowed', 405
-
-    # Call by arguments: api/?max_length=200&num_beams=2&top_p=0.95&seed=1337
-    @app.route("/")
-    def main():
-        #  Time
-        start_time = time.time()
-        elapsed_time = lambda: time.time() - start_time
-        res={
-            "elapsed_time_seconds": f'{elapsed_time():2.3f}',
-        }
-        return res
 
     return app
 
