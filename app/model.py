@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from enum import Enum
 from typing import List, Optional, Union
-from datetime import datetime
+from datetime import datetime, date, time
 from pydantic_mongo import AbstractRepository, ObjectIdField
 
 class UserEnum(str,Enum):
@@ -25,10 +25,6 @@ class User(BaseModel):
     modified: datetime
     active: bool = True
 
-    def to_json(self):
-        return {"name":self.idunam,
-                "url":self.url}
-
     def is_authenticated(self):
         return True
 
@@ -45,3 +41,27 @@ class User(BaseModel):
 class UserRepository(AbstractRepository[User]):
     class Meta:
         collection_name = 'users'
+
+class Course(BaseModel):
+    id: ObjectIdField = None
+    course_name : str = "Lenguajes Formales y Automatas"
+    institution: str = "Faculad de Ingeniería, Universidad Nacional Autónoma de México"
+    initials : str = "LFYA"
+    course_id: str
+    year: str
+    semester: str
+    created: datetime
+    modified: datetime
+    info: Optional[str]
+    links: Optional[dict]
+    starting_date: Optional[date]
+    finishes_date: Optional[date]
+    starting_time: Optional[time]
+    finishin_time: Optional[time]
+    active: bool = True
+
+class CourseRepository(AbstractRepository[Course]):
+    class Meta:
+        collection_name = 'courses'
+
+

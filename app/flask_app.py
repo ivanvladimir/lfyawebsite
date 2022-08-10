@@ -10,9 +10,12 @@ from html import escape
 import git
 import time
 import subprocess
+import uuid
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from bson.objectid import ObjectId
+from .model import UserEnum, User, UserRepository, Course, CourseRepository
+from .utils import read_value, chose_value
 
 __VERSION__ = "0.1.0"
 __APP_NAME__= "Lenguajes Formales y Autómatas"
@@ -23,17 +26,12 @@ def create_app(test_config=None):
 
     # Arrange configuration
     from . import config
-    from . import database
+    from .database import mongo
     @lru_cache()
     def get_settings():
         return config.Settings()
 
-    @lru_cache()
-    def get_database():
-        return database.get_mongo()
-
     setting=get_settings()
-    mongo=get_database()
     # Configuring logging
     dictConfig(setting.LOGGING_CONFIG)
 
@@ -43,6 +41,7 @@ def create_app(test_config=None):
     # create app
     app = Flask(__name__)
     user_cli = AppGroup('user')
+    course_cli = AppGroup('course')
 
 	# Initialazing variables
     app.config['START_TIME'] = time.time()
@@ -61,26 +60,30 @@ def create_app(test_config=None):
     # Import Blueprints
     from .api import api
     from .main import main
+    from .admin import admin
     app.register_blueprint(main,
             static_url_path='/static',
             static_folder='static')
+    app.register_blueprint(admin,
+            static_url_path='/static',
+            static_folder='static', url_prefix="/admin")
     app.register_blueprint(api,url_prefix="/api")
 
+    users=UserRepository(database=mongo.db)
+
     # Connecting to database
+    @login_manager.user_loader
+    def load_user(user_id):
+        return users.find_one_by_id(ObjectId(user_id))
+
+
+    login_manager.blueprint_login_views = {
+            'main': '/admin/login',
+            }
 
     # Flask commands
     @user_cli.command('initdb')
-    def create_user():
-        import getpass
-        from .model import UserEnum, User, UserRepository
-
-        def read_value(info, passwd=False):
-            value=input(info) if not passwd else getpass.getpass(info)
-            while len(value.strip())==0:
-                print("Sin valor, intentar de nuevo")
-                value=input(info) if not passwd else getpass.getpass(info)
-            return value
-
+    def init_db():
         collection_names=set(mongo.db.collection_names())
         collection_names_to_create=set(['users','forum','activities','activity'])
         if len(collection_names.intersection(collection_names_to_create))>0:
@@ -89,28 +92,65 @@ def create_app(test_config=None):
 
         users=UserRepository(database=mongo.db)
 
-        for collection_name in collection_names_to_create:
-            mongo.db[collection_name]
-            app.logger.info(f"Colletion created {collection_name}")
-
         email= read_value("Correo electrónico:")
         firstname= read_value("Nombre (sin apellidos):")
         lastname= read_value("Apellidos:")
         password = generate_password_hash(read_value("Password:",passwd=True))
         dt = datetime.utcnow()
 
-        admin = User(
-            role= UserEnum.admin,
+        student = User(
+            role= UserEnum.student,
             email=email,
             lastname=lastname,
             firstname=firstname,
             password=password,
             created=dt,
             modified=dt)
-        users.save(admin)
+        users.save(student)
+
+    @user_cli.command('add')
+    def create_user():
+        users=UserRepository(database=mongo.db)
+
+        email= read_value("Correo electrónico:")
+        firstname= read_value("Nombre (sin apellidos):")
+        lastname= read_value("Apellidos:")
+        role = chose_value("Role:",{"estudiante":UserEnum.student, 'teacher':UserEnum.teacher, "ayudante":UserEnum.teacher_assistant})
+        dt = datetime.utcnow()
+
+        user = User(
+            role= UserEnum.admin,
+            email=email,
+            lastname=lastname,
+            firstname=firstname,
+            url=str(uuid.uuid4()),
+            created=dt,
+            modified=dt)
+        users.save(user)
+
+    @course_cli.command('add')
+    def create_course():
+        courses=CourseRepository(database=mongo.db)
+
+        name= read_value("Nombre:")
+        initials= read_value("Iniciales:")
+        year= read_value("Año (eg. 2023):")
+        semester = read_value("Semestre (1 o 2):")
+        dt = datetime.utcnow()
+
+        course = Course(
+                name=name,
+                initials=initials,
+                year=year,
+                semester=semester,
+                course_id=f"{initials.lower()}{year[-2:]}{'i' if semester=='1' else 'ii'}",
+                created=dt,
+                modified=dt)
+        courses.save(course)
 
     # Adding commands
     app.cli.add_command(user_cli)
+    app.cli.add_command(course_cli)
 
     # Verifies token from webhook 
     def verify_signature(req):
@@ -134,7 +174,6 @@ def create_app(test_config=None):
                 return 'Forbidden', 403
         else:
             return 'Not allowed', 405
-
 
     return app
 

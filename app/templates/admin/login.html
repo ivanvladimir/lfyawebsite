@@ -1,0 +1,13 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Login administrador
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{url_for('admin.login')}}">
+    {{ form.csrf_token }}
+    {{ form.label }} {{ form.password(size=20) }}
+    <input type="submit" value="Ingresar">
+</form>
+{% endblock %}
