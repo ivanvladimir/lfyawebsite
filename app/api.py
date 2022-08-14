@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app
+from flask_jwt_extended import jwt_required
 import time
 
 api = Blueprint('api', __name__)
@@ -19,5 +20,12 @@ def info():
         "elapsed_time_seconds": f'{elapsed_time():2.3f}',
         'uptime': f"{time.time() - current_app.config['START_TIME']:2.3f} segs",
         }
+
+@api.route('/test')
+@jwt_required()
+def test():
+    """Testing access"""
+    return '<ul><li>One</li><li>Two</li><li>Three</li></ul>'
+
 
 

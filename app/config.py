@@ -8,7 +8,9 @@ class Settings(BaseSettings):
     WTF_CSRF_SECRET_KEY: str = "otro secreto acá"
     DATABASE_MONGO_URI: str=""
     EMAIL_USER: str=""
-    AUTH2_CREDENTIALS_FILE: str=""
+    JWT_COOKIE_SECURE: bool = True
+    JWT_SECRET_KEY: str = ""
+
     LOGGING_CONFIG: dict={
         'version': 1,
         'formatters': {'default': {

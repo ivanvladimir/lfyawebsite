@@ -2,6 +2,8 @@ import click
 from flask import Flask, request, render_template
 from flask.cli import AppGroup
 from flask_login import LoginManager
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from logging.config import dictConfig
 import hmac
 import yagmail
@@ -39,6 +41,8 @@ def create_app(test_config=None):
 
     # Configuring authentification
     login_manager = LoginManager()
+    jwt_manager = JWTManager()
+    cors = CORS()
 
     # create app
     app = Flask(__name__)
@@ -46,7 +50,7 @@ def create_app(test_config=None):
     admin_cli = AppGroup('admin')
     course_cli = AppGroup('course')
 
-	# Initialazing variables
+    # Initialazing variables
     app.config['START_TIME'] = time.time()
     app.config['STATUS'] = "Active"
     app.config['__APP_NAME__'] =  __APP_NAME__
@@ -55,9 +59,14 @@ def create_app(test_config=None):
     app.config['WTF_CSRF_SECRET_KEY'] = setting.WTF_CSRF_SECRET_KEY
     app.config['MONGO_URI'] = setting.DATABASE_MONGO_URI
     app.config['EMAIL_USER'] = setting.EMAIL_USER
-     
+    app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies", "json"]
+    app.config["JWT_COOKIE_SECURE"] = setting.JWT_COOKIE_SECURE
+    app.config["JWT_SECRET_KEY"] = setting.JWT_SECRET_KEY
+
     # Initaalazing modules
     login_manager.init_app(app)
+    jwt_manager.init_app(app)
+    cors.init_app(app)
     mongo.init_app(app)
     app.logger.info("Connected to DB")
 
