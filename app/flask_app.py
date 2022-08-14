@@ -65,8 +65,8 @@ def create_app(test_config=None):
 
     # Initaalazing modules
     login_manager.init_app(app)
-    jwt_manager.init_app(app)
     cors.init_app(app)
+    jwt_manager.init_app(app)
     mongo.init_app(app)
     app.logger.info("Connected to DB")
 
