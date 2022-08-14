@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, current_app
-from flask_login import LoginManager, login_user, logout_user, login_required, login_manager
+from flask_login import LoginManager, login_user, logout_user, login_required, login_manager, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import time
 import yagmail
+import markdown
 from .forms import *
 from .model import UserEnum, User, UserRepository
 from .database import mongo
@@ -16,9 +17,13 @@ def index():
     #  Time
     start_time = time.time()
     elapsed_time = lambda: time.time() - start_time
-    return render_template("admin/home.html",
-        elapsed_time_seconds= f'{elapsed_time():2.3f}'
-    )
+    if current_user.is_authenticated:
+        return render_template("admin/home.html",
+            elapsed_time_seconds= f'{elapsed_time():2.3f}'
+        )
+    else:
+        return redirect(url_for('admin.login'))
+
 
 @admin.route("/login",methods=["GET","POST"])
 def login():
@@ -58,7 +63,7 @@ def mail_to():
         yag= yagmail.SMTP(current_app.config.get('EMAIL_USER'))
         yag.send(form.to.data,
                 form.subject.data,
-                form.msg.data)
+                [markdown.markdown(form.msg.data)])
         return render_template("admin/mail_sent.html",
                 form=form,
                 elapsed_time_seconds= f'{elapsed_time():2.3f}'

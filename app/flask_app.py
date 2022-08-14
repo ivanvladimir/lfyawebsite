@@ -88,11 +88,10 @@ def create_app(test_config=None):
     # Flask commands
     @admin_cli.command('register_email')
     def register_email():
-
-        passwd=getpass.getpass(f"Introduce password para {setting.EMAIL_USER}")
+        passwd=getpass.getpass(f"Introduce password para {setting.EMAIL_USER}: ")
         yagmail.register(setting.EMAIL_USER, passwd) 
 
-    @user_cli.command('initdb')
+    @admin_cli.command('initdb')
     def init_db():
         collection_names=set(mongo.db.collection_names())
         collection_names_to_create=set(['users','forum','activities','activity'])
@@ -102,10 +101,10 @@ def create_app(test_config=None):
 
         users=UserRepository(database=mongo.db)
 
-        email= read_value("Correo electrónico:")
-        firstname= read_value("Nombre (sin apellidos):")
-        lastname= read_value("Apellidos:")
-        password = generate_password_hash(read_value("Password:",passwd=True))
+        email= read_value("Correo electrónico: ")
+        firstname= read_value("Nombre (sin apellidos): ")
+        lastname= read_value("Apellidos: ")
+        password = generate_password_hash(read_value("Password: ",passwd=True))
         dt = datetime.utcnow()
 
         student = User(
@@ -122,9 +121,9 @@ def create_app(test_config=None):
     def create_user():
         users=UserRepository(database=mongo.db)
 
-        email= read_value("Correo electrónico:")
-        firstname= read_value("Nombre (sin apellidos):")
-        lastname= read_value("Apellidos:")
+        email= read_value("Correo electrónico: ")
+        firstname= read_value("Nombre (sin apellidos): ")
+        lastname= read_value("Apellidos: ")
         role = chose_value("Role:",{"estudiante":UserEnum.student, 'teacher':UserEnum.teacher, "ayudante":UserEnum.teacher_assistant})
         dt = datetime.utcnow()
 
@@ -142,10 +141,10 @@ def create_app(test_config=None):
     def create_course():
         courses=CourseRepository(database=mongo.db)
 
-        name= read_value("Nombre:")
-        initials= read_value("Iniciales:")
-        year= read_value("Año (eg. 2023):")
-        semester = read_value("Semestre (1 o 2):")
+        name= read_value("Nombre: ")
+        initials= read_value("Iniciales: ")
+        year= read_value("Año (eg. 2023): ")
+        semester = read_value("Semestre (1 o 2): ")
         dt = datetime.utcnow()
 
         course = Course(

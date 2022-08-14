@@ -31,6 +31,7 @@ class MailTo(FlaskForm):
             [wtforms.validators.DataRequired("Ingresar el mensaje a enviar")],
             render_kw={
                 'class':'textarea',
+                'id':'msg1',
                 'placeholder':'escribe el mensaje',
                 'rows':10})
 

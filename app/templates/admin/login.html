@@ -6,14 +6,18 @@ Login administrador
 
 {% block content %}
 
-<h2>Ingresar como administrador</h2>>
+<h2>Ingresar como administrador</h2>
 
 <form method="POST" action="{{url_for('admin.login')}}">
     {{ form.csrf_token }}
     <label class="label">{{ form.password.label }}</label>
     <div class="controls">
-        {{ form.password(size=20) }}
+        {{ form.password() }}
     </div>
-    <input type="submit" value="Ingresar">
+    <div class="field">
+        <div class="control">
+            <button type="submit" value="send" class="button is-link">Ingresar</button>
+        </div>
+    </div>
 </form>
 {% endblock %}

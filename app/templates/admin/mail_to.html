@@ -1,5 +1,10 @@
 {% extends 'admin/base.html' %}
 
+{% block extra_links%}
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+{% endblock %}
+
 {% block title %}
 Send email
 {% endblock %}
@@ -33,13 +38,26 @@ Send email
         {{ form.msg()}}
         </div>
     </div>
+
     <div class="field is-grouped">
         <div class="control">
-            <button type="submit" value="send" class="button is-link">Enviar</button>
+            <button id="send-button" type="submit" value="send" class="button is-link">Enviar</button>
         </div>
         <div class="control">
             <a href="{{url_for('admin.index')}}" class="button is-link is-light">Cancel</a>
         </div>
     </div>
 </form>
+
+<script>
+	const easyMDE = new EasyMDE({ element: document.getElementById("msg1"),
+		spellChecker: false,
+	});
+    const msg = document.getElementById('msg1');
+
+	simplemde.codemirror.on("change", function(){
+          msg.value = simplemde.value();
+	});
+
+</script>
 {% endblock %}
