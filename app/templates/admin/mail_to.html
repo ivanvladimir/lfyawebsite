@@ -1,0 +1,45 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Send email
+{% endblock %}
+
+{% block content %}
+
+
+
+<form method="POST" action="{{url_for('admin.mail_to')}}">
+    {{ form.csrf_token }}
+
+    <div class="field">
+        <label class="label">{{ form.to.label }}</label>
+        <div class="control">
+        {{ form.to(type='text') }}
+
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">{{ form.subject.label }}</label>
+        <div class="control">
+        {{ form.subject() }}
+        </div>
+    </div>
+
+
+    <div class="field">
+        <label class="label">{{ form.msg.label }}</label>
+        <div class="control">
+        {{ form.msg()}}
+        </div>
+    </div>
+    <div class="field is-grouped">
+        <div class="control">
+            <button type="submit" value="send" class="button is-link">Enviar</button>
+        </div>
+        <div class="control">
+            <a href="{{url_for('admin.index')}}" class="button is-link is-light">Cancel</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -1,7 +1,36 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField 
+import wtforms 
 
 class AdminLogin(FlaskForm):
-    password = PasswordField(label="Password",
-            
-            render_kw={'placeholder':'password'})
+    password = wtforms.fields.PasswordField(
+            "Password",
+            [wtforms.validators.DataRequired("Ingresar el password")],
+            render_kw={
+                'class':'input',
+                'placeholder':'password'
+                })
+
+
+class MailTo(FlaskForm):
+    to = wtforms.fields.EmailField(
+            "A:",
+            [wtforms.validators.DataRequired("Ingresar a quien va dirigido"),wtforms.validators.Email("Ingresar un correo válido")],
+            render_kw={
+                'class':'input',
+                'placeholder':'email'
+                })
+    subject = wtforms.fields.StringField(
+            "Tema:",
+            [wtforms.validators.DataRequired("Ingresar el tema")],
+            render_kw={
+                'class':'input',
+                'placeholder':'tema'
+                })
+    msg = wtforms.fields.TextAreaField(
+            "Mensaje",
+            [wtforms.validators.DataRequired("Ingresar el mensaje a enviar")],
+            render_kw={
+                'class':'textarea',
+                'placeholder':'escribe el mensaje',
+                'rows':10})
+

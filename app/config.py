@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "un secreto aquí"
     WTF_CSRF_SECRET_KEY: str = "otro secreto acá"
     DATABASE_MONGO_URI: str=""
+    EMAIL_USER: str=""
+    AUTH2_CREDENTIALS_FILE: str=""
     LOGGING_CONFIG: dict={
         'version': 1,
         'formatters': {'default': {

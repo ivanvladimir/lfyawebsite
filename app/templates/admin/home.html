@@ -1,0 +1,19 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Login administrador
+{% endblock %}
+
+{% block content %}
+
+
+<h1>Acciones</h1>
+
+<p>
+
+<ul>
+    <li><a href="{{url_for('admin.mail_to')}}">Enviar correo</a></li>
+</ul>
+</p>
+
+{% endblock %}

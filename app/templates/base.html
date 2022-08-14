@@ -34,7 +34,13 @@
       <a class="navbar-item" href="{{url_for('main.index')}}" >
         Tareas
       </a>
+    {% block extra_options %}{% endblock %}
     </div>
+
+    <div class="navbar-end">
+    {% block extra_buttons %}{% endblock %}
+    </div>
+
   </div>
 </nav>
 <section class="hero is-primary">
@@ -49,7 +55,11 @@
     <div class="flash">{{ message }}</div>
   {% endfor %}
   <section class="section">
+      <div class="columns is-mobile">
+        <div class="column is-half is-offset-1">
   {% block content %}{% endblock %}
+        </div>
+      </div>
   </section>
   </div>
 

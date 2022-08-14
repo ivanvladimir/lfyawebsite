@@ -4,15 +4,12 @@
 
 {% block header %}
     <p class="title">
-        Bienvenido al sitio de LFyA
+        Bienvenido al sitio del curso de Lenguajes Formales y Autómatas
     </p>
-
 {% endblock %}
 
 {% block content %}
-<form method="POST" action="/admin">
-    {{ form.csrf_token }}
-    {{ form..label }} {{ form.name(size=20) }}
-    <input type="submit" value="Ingresar">
-</form>
+
+<p>Para ingresar utiliza el link enviado a tu correo.</p>
+
 {% endblock %}

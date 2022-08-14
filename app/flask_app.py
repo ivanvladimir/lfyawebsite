@@ -4,7 +4,9 @@ from flask.cli import AppGroup
 from flask_login import LoginManager
 from logging.config import dictConfig
 import hmac
+import yagmail
 import hashlib
+import getpass
 from functools import lru_cache
 from html import escape
 import git
@@ -41,6 +43,7 @@ def create_app(test_config=None):
     # create app
     app = Flask(__name__)
     user_cli = AppGroup('user')
+    admin_cli = AppGroup('admin')
     course_cli = AppGroup('course')
 
 	# Initialazing variables
@@ -50,8 +53,9 @@ def create_app(test_config=None):
     app.config['__VERSION__'] = __VERSION__
     app.config['SECRET_KEY'] = setting.SECRET_KEY
     app.config['WTF_CSRF_SECRET_KEY'] = setting.WTF_CSRF_SECRET_KEY
-    app.config["MONGO_URI"] = setting.DATABASE_MONGO_URI
-
+    app.config['MONGO_URI'] = setting.DATABASE_MONGO_URI
+    app.config['EMAIL_USER'] = setting.EMAIL_USER
+     
     # Initaalazing modules
     login_manager.init_app(app)
     mongo.init_app(app)
@@ -82,6 +86,12 @@ def create_app(test_config=None):
             }
 
     # Flask commands
+    @admin_cli.command('register_email')
+    def register_email():
+
+        passwd=getpass.getpass(f"Introduce password para {setting.EMAIL_USER}")
+        yagmail.register(setting.EMAIL_USER, passwd) 
+
     @user_cli.command('initdb')
     def init_db():
         collection_names=set(mongo.db.collection_names())
@@ -119,7 +129,7 @@ def create_app(test_config=None):
         dt = datetime.utcnow()
 
         user = User(
-            role= UserEnum.admin,
+            role= role,
             email=email,
             lastname=lastname,
             firstname=firstname,
@@ -151,6 +161,7 @@ def create_app(test_config=None):
     # Adding commands
     app.cli.add_command(user_cli)
     app.cli.add_command(course_cli)
+    app.cli.add_command(admin_cli)
 
     # Verifies token from webhook 
     def verify_signature(req):
