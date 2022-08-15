@@ -1,0 +1,21 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Profesor
+{% endblock %}
+
+{% block content %}
+
+
+<h1>Grupos</h1>
+
+<p>
+
+<ul>
+    {% for g in groups %}
+    <li><a href="{{url_for('teacher.list',course_id=g.course_id)}}">{{g.course_id}}</a></li>
+    {% endfor %}
+</ul>
+</p>
+
+{% endblock %}

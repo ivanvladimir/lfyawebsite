@@ -1,0 +1,41 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Participación
+{% endblock %}
+
+{% block content %}
+
+
+<h1>Acciones</h1>
+<center>
+    <a href="{{url_for('teacher.attendance_list',course_id=course_id)}}" class="button is-info">Ir a assistencias</a>
+</center>
+
+<hr/>
+
+<h1>Lista de estudiantes</h1>
+<p>
+<table class="table">
+    <thead>
+    <tr>
+    <th>Nombre</th>
+    <th><button class="button is-success">+</button></th>
+    <th><button class="button is-danger">-</button></th>
+    <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for s,points,course_student_id in students %}
+    <tr>
+    <td><a href="">{{s.firstname}} {{s.lastname}}</a></td>
+    <td><a hx-get="{{url_for('api.add',course_student_id=course_student_id)}}" hx-target="#points-{{loop.index}}"  class="button is-success">+</a></td>
+    <td><a hx-get="{{url_for('api.substract',course_student_id=course_student_id)}}" hx-target="#points-{{loop.index}}"  class="button is-danger">-</a></td>
+    <td id="points-{{loop.index}}">{{points}}</td>
+    <tr>
+    {% endfor %}
+    </tbody>
+</table>
+</p>
+
+{% endblock %}

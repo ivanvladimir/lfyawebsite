@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Assistencia
+{% endblock %}
+
+{% block content %}
+
+
+<h1>Estudiantes</h1>
+
+<p>
+<table class="table">
+    <thead>
+    <tr>
+    <th>Nombre</th>
+    <th>Presente</th>
+    <th>Ausente</th>
+    <th>Retardo</th>
+    <th>Justificado</th>
+    <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for s,a in students %}
+    <tr>
+    <td><a href="">{{s.firstname}} {{s.lastname}}</a></td>
+    <td><a class="button is-success{% if not a.status=="present"%} is-light{% endif %}"
+           hx-get="{{url_for('api.change_status_attendance',status='present',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
+            >Presente</a> </td>
+    <td><a class="button is-danger{% if not a.status=="absent"%} is-light{% endif %}"
+           hx-get="{{url_for('api.change_status_attendance',status='absent',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
+            >Ausente</a> </td>
+    <td><a class="button is-warning{% if not a.status=="late"%} is-light{% endif %}"
+           hx-get="{{url_for('api.change_status_attendance',status='late',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
+            >Retardo</a> </td>
+    <td><a class="button is-info{% if not a.status=="justified"%} is-light{% endif %}"
+           hx-get="{{url_for('api.change_status_attendance',status='justified',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
+            >Jusitificado</a> </td>
+ 
+    <td id="status-{{loop.index}}">{{a.status}}</td>
+    <tr>
+    {% endfor %}
+    </tbody>
+</table>
+</p>
+
+{% endblock %}

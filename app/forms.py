@@ -11,6 +11,17 @@ class AdminLogin(FlaskForm):
                 })
 
 
+class DateF(FlaskForm):
+    date = wtforms.fields.DateField(
+            "Fecha",
+            [wtforms.validators.DataRequired("Ingresar el fecha")],
+            format='%d/%m/%Y',
+            render_kw={
+                'class':'input',
+                'placeholder':'22/09/2024'
+                })
+
+
 class MailTo(FlaskForm):
     to = wtforms.fields.EmailField(
             "A:",

@@ -38,7 +38,7 @@ def create_app(test_config=None):
 
     setting=get_settings()
     # Configuring logging
-    logging.basicConfig(filename = 'filename.log', level=logging.INFO, format = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s')
+    logging.basicConfig(level=logging.INFO, format = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s')
 
     # Configuring authentification
     login_manager = LoginManager()
@@ -76,12 +76,17 @@ def create_app(test_config=None):
     from .api import api
     from .main import main
     from .admin import admin
+    from .teacher import teacher
     app.register_blueprint(main,
             static_url_path='/static',
             static_folder='static')
     app.register_blueprint(admin,
             static_url_path='/static',
             static_folder='static', url_prefix="/admin")
+    app.register_blueprint(teacher,
+            static_url_path='/static',
+            static_folder='static', url_prefix="/teacher")
+ 
     app.register_blueprint(api,url_prefix="/api")
 
     users=UserRepository(database=mongo.db)

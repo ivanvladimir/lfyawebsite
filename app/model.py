@@ -11,7 +11,7 @@ class UserEnum(str,Enum):
     student = 'student'
 
 class AttendanceEnum(str,Enum):
-    inperson = 'present'
+    present = 'present'
     justificated = 'justificated'
     late = 'late'
     absent = 'absent'
@@ -101,8 +101,8 @@ class Attendance(BaseModel):
     student: str
     course: str
     observations: Optional[str]
-    date: date
-    Attendance: AttendanceEnum
+    date: datetime
+    status: AttendanceEnum
     created: datetime
     modified: datetime
 
