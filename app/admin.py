@@ -32,8 +32,7 @@ def index():
 @admin.route("/login",methods=["GET","POST"])
 def login():
     start_time = time.time()
-    
-    lapsed_time = lambda: time.time() - start_time
+    elapsed_time = lambda: time.time() - start_time
 
     form=AdminLogin()
 
