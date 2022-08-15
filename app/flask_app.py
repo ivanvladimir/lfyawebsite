@@ -1,4 +1,5 @@
 import click
+import tqdm
 from flask import Flask, request, render_template
 from flask.cli import AppGroup
 from flask_login import LoginManager
@@ -12,13 +13,13 @@ import getpass
 from functools import lru_cache
 from html import escape
 import git
-import time
 import subprocess
 import uuid
+import time as time_
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
-from .model import UserEnum, User, UserRepository, Course, CourseRepository
+from .model import *
 from .utils import read_value, chose_value
 
 __VERSION__ = "0.1.0"
@@ -49,9 +50,10 @@ def create_app(test_config=None):
     user_cli = AppGroup('user')
     admin_cli = AppGroup('admin')
     course_cli = AppGroup('course')
+    student_cli = AppGroup('student')
 
     # Initialazing variables
-    app.config['START_TIME'] = time.time()
+    app.config['START_TIME'] = time_.time()
     app.config['STATUS'] = "Active"
     app.config['__APP_NAME__'] =  __APP_NAME__
     app.config['__VERSION__'] = __VERSION__
@@ -146,6 +148,42 @@ def create_app(test_config=None):
             modified=dt)
         users.save(user)
 
+    @user_cli.command('assign')
+    @click.argument('email')
+    @click.argument('course_id')
+    def assign(email,course_id):
+        courses=CourseRepository(database=mongo.db)
+        users=UserRepository(database=mongo.db)
+        course=courses.find_one_by({'course_id':course_id})
+        user=users.find_one_by({'email':email})
+        if not course:
+            print(f"Error {course_id} course not found")
+            return
+        if not user:
+            print(f"Error {email} email not found")
+            return
+
+        dt = datetime.utcnow()
+
+        if user.role == UserEnum.teacher:
+            rep=CourseTeacherRepository(database=mongo.db)
+            link=CourseTeacher(
+                    course=str(course.id),
+                    teacher=str(user.id),
+                    participation=0,
+                    created=dt,
+                    modified=dt)
+            rep.save(link)
+        if user.role == UserEnum.student:
+            rep=CourseStudentRepository(database=mongo.db)
+            link=CourseStudent(
+                    course=str(course.id),
+                    student=str(user.id),
+                    participation=0,
+                    created=dt,
+                    modified=dt)
+            rep.save(link)
+
     @course_cli.command('add')
     def create_course():
         courses=CourseRepository(database=mongo.db)
@@ -166,10 +204,49 @@ def create_app(test_config=None):
                 modified=dt)
         courses.save(course)
 
+    @student_cli.command('import')
+    @click.argument('csv_filename')
+    @click.argument('course_id')
+    def import_students(csv_filename,course_id):
+        import csv
+        course_student=CourseStudentRepository(database=mongo.db)
+        courses=CourseRepository(database=mongo.db)
+        course=courses.find_one_by({'course_id':course_id})
+        if course:
+            users=UserRepository(database=mongo.db)
+
+            with open(csv_filename) as csv_file:
+                csv = list(csv.reader(csv_file, delimiter=','))
+
+            for r in tqdm.tqdm(csv):
+                dt = datetime.utcnow()
+                user = User(
+                    role= UserEnum.student,
+                    email=r[3].strip(),
+                    lastname=r[1].strip(),
+                    firstname=r[2].strip(),
+                    url=str(uuid.uuid4()),
+                    idunam=r[0].strip(),
+                    created=dt,
+                    modified=dt)
+                result=users.save(user)
+                link=CourseStudent(
+                        course=str(course.id),
+                        student=str(result.inserted_id),
+                        participation=0,
+                        created=dt,
+                        modified=dt)
+                course_student.save(link)
+        else:
+            print(f"Error {course_id} course not found")
+
+
+
     # Adding commands
     app.cli.add_command(user_cli)
     app.cli.add_command(course_cli)
     app.cli.add_command(admin_cli)
+    app.cli.add_command(student_cli)
 
     # Verifies token from webhook 
     def verify_signature(req):

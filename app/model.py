@@ -10,6 +10,12 @@ class UserEnum(str,Enum):
     teacher_assistant = "teacher_assistant"
     student = 'student'
 
+class AttendanceEnum(str,Enum):
+    inperson = 'present'
+    justificated = 'justificated'
+    late = 'late'
+    absent = 'absent'
+
 class User(BaseModel):
     id: ObjectIdField = None
     role: UserEnum
@@ -63,5 +69,45 @@ class Course(BaseModel):
 class CourseRepository(AbstractRepository[Course]):
     class Meta:
         collection_name = 'courses'
+
+
+class CourseTeacher(BaseModel):
+    id: ObjectIdField = None
+    teacher: str
+    course: str
+    notes: Optional[str]
+    created: datetime
+    modified: datetime
+
+class CourseTeacherRepository(AbstractRepository[CourseTeacher]):
+    class Meta:
+        collection_name = 'course_teacher'
+
+class CourseStudent(BaseModel):
+    id: ObjectIdField = None
+    student: str
+    course: str
+    participation: int = 0
+    grade: Optional[float]
+    created: datetime
+    modified: datetime
+
+class CourseStudentRepository(AbstractRepository[CourseStudent]):
+    class Meta:
+        collection_name = 'course_student'
+
+class Attendance(BaseModel):
+    id: ObjectIdField = None
+    student: str
+    course: str
+    observations: Optional[str]
+    date: date
+    Attendance: AttendanceEnum
+    created: datetime
+    modified: datetime
+
+class AttendanceRepository(AbstractRepository[Attendance]):
+    class Meta:
+        collection_name = 'attendance'
 
 
