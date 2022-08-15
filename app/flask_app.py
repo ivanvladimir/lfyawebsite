@@ -4,7 +4,7 @@ from flask.cli import AppGroup
 from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from logging.config import dictConfig
+import logging
 import hmac
 import yagmail
 import hashlib
@@ -37,12 +37,12 @@ def create_app(test_config=None):
 
     setting=get_settings()
     # Configuring logging
-    dictConfig(setting.LOGGING_CONFIG)
+    logging.basicConfig(filename = 'filename.log', level=logging.INFO, format = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s')
 
     # Configuring authentification
     login_manager = LoginManager()
     jwt_manager = JWTManager()
-    #cors = CORS()
+    cors = CORS()
 
     # create app
     app = Flask(__name__)
@@ -65,7 +65,7 @@ def create_app(test_config=None):
 
     # Initaalazing modules
     login_manager.init_app(app)
-    #cors.init_app(app)
+    cors.init_app(app)
     jwt_manager.init_app(app)
     mongo.init_app(app)
     app.logger.info("Connected to DB")
