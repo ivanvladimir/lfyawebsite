@@ -42,7 +42,7 @@ def create_app(test_config=None):
     # Configuring authentification
     login_manager = LoginManager()
     jwt_manager = JWTManager()
-    cors = CORS()
+    #cors = CORS()
 
     # create app
     app = Flask(__name__)
@@ -65,7 +65,7 @@ def create_app(test_config=None):
 
     # Initaalazing modules
     login_manager.init_app(app)
-    cors.init_app(app)
+    #cors.init_app(app)
     jwt_manager.init_app(app)
     mongo.init_app(app)
     app.logger.info("Connected to DB")
