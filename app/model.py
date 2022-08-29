@@ -4,17 +4,20 @@ from typing import List, Optional, Union
 from datetime import datetime, date, time
 from pydantic_mongo import AbstractRepository, ObjectIdField
 
-class UserEnum(str,Enum):
-    admin = 'admin'
-    teacher = 'teacher'
-    teacher_assistant = "teacher_assistant"
-    student = 'student'
 
-class AttendanceEnum(str,Enum):
-    present = 'present'
-    justificated = 'justificated'
-    late = 'late'
-    absent = 'absent'
+class UserEnum(str, Enum):
+    admin = "admin"
+    teacher = "teacher"
+    teacher_assistant = "teacher_assistant"
+    student = "student"
+
+
+class AttendanceEnum(str, Enum):
+    present = "present"
+    justificated = "justificated"
+    late = "late"
+    absent = "absent"
+
 
 class User(BaseModel):
     id: ObjectIdField = None
@@ -46,13 +49,14 @@ class User(BaseModel):
 
 class UserRepository(AbstractRepository[User]):
     class Meta:
-        collection_name = 'users'
+        collection_name = "users"
+
 
 class Course(BaseModel):
     id: ObjectIdField = None
-    course_name : str = "Lenguajes Formales y Automatas"
+    course_name: str = "Lenguajes Formales y Automatas"
     institution: str = "Faculad de Ingeniería, Universidad Nacional Autónoma de México"
-    initials : str = "LFYA"
+    initials: str = "LFYA"
     course_id: str
     year: str
     semester: str
@@ -66,9 +70,10 @@ class Course(BaseModel):
     finishin_time: Optional[time]
     active: bool = True
 
+
 class CourseRepository(AbstractRepository[Course]):
     class Meta:
-        collection_name = 'courses'
+        collection_name = "courses"
 
 
 class CourseTeacher(BaseModel):
@@ -79,9 +84,11 @@ class CourseTeacher(BaseModel):
     created: datetime
     modified: datetime
 
+
 class CourseTeacherRepository(AbstractRepository[CourseTeacher]):
     class Meta:
-        collection_name = 'course_teacher'
+        collection_name = "course_teacher"
+
 
 class CourseStudent(BaseModel):
     id: ObjectIdField = None
@@ -92,9 +99,11 @@ class CourseStudent(BaseModel):
     created: datetime
     modified: datetime
 
+
 class CourseStudentRepository(AbstractRepository[CourseStudent]):
     class Meta:
-        collection_name = 'course_student'
+        collection_name = "course_student"
+
 
 class Attendance(BaseModel):
     id: ObjectIdField = None
@@ -106,8 +115,7 @@ class Attendance(BaseModel):
     created: datetime
     modified: datetime
 
+
 class AttendanceRepository(AbstractRepository[Attendance]):
     class Meta:
-        collection_name = 'attendance'
-
-
+        collection_name = "attendance"
