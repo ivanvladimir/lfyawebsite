@@ -1,5 +1,7 @@
-from flask import Blueprint, current_app, request
+from flask import Blueprint, current_app, request, url_for
 from flask_jwt_extended import jwt_required
+import random
+import humanize
 from .model import *
 from .database import mongo
 from datetime import datetime
@@ -82,12 +84,55 @@ def create_attendance(course_id):
         attendance.save(att)
 
     days = attendance.find_by({"course": course_id})
-    days = set(d.date.date() for d in days)
+    days = list(set(d.date.date() for d in days))
+    days = sorted(days,reverse=True)
 
-    days = [f"<li>{d}</li>" for d in sorted(days)]
+    days = ['<li><a href="{url_for("teacher.attendance_date",course_id=course_id, date=d)}">{humanize.naturaldate(d)}</a></li>' for d in sorted(days)]
 
     return "\n".join(days)
 
+
+@api.route("/<course_id>/attendance/list/<date>", methods=["GET"])
+@jwt_required()
+def attendance_list(course_id,date):
+    """Changin points"""
+    date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    course = courses.find_one_by({"course_id": course_id})
+    student_ids = course_student.find_by({"course": str(course.id)})
+    attendance_student=attendance.find_by({"date": date})
+    students_ = {
+            s.student:users.find_one_by_id(ObjectId(s.student))
+        for s in student_ids
+    }
+    students = [(students_[a_s.student],a_s)
+            for a_s in attendance_student
+            ]
+
+    students = sorted(students, key=lambda s: s[0].firstname)
+    if 'random' in request.args:
+        random.shuffle(students)
+
+    bits=[]
+    for index,(s,a) in enumerate(students):
+        s=f"""<tr>
+        <td><a href="">{s.firstname} {s.lastname}</a></td>
+        <td><a class="button is-success {'is-light' if not a.status=='present' else '' }"
+           hx-get="{url_for('api.change_status_attendance',status='present',attendance_id=a.id)}" hx-target='#status-{index}'
+            >Presente</a> </td>
+        <td><a class="button is-danger {'is-light' if not a.status=='absent' else '' }"
+           hx-get="{url_for('api.change_status_attendance',status='absent',attendance_id=a.id)}" hx-target='#status-{index}'
+            >Ausente</a> </td>
+        <td><a class="button is-warning {'is-light' if not a.status=='late' else '' }"
+           hx-get="{url_for('api.change_status_attendance',status='late',attendance_id=a.id)}" hx-target='#status-{index}'
+            >Retardo</a> </td>
+        <td><a class="button is-info {'is-light' if not a.status=='justified' else '' }"
+           hx-get="{url_for('api.change_status_attendance',status='justified',attendance_id=a.id)}" hx-target='#status-{index}'
+            >Jusitificado</a> </td>
+        <td id="status-{index}">{a.status}</td>
+        <tr>"""
+        bits.append(s)
+    return "\n".join(bits)
+ 
 
 @api.route("/status/<status>/<attendance_id>")
 @jwt_required()

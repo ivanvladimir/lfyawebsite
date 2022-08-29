@@ -9,6 +9,9 @@ Assistencia
 
 <h1>Estudiantes</h1>
 
+<a class="button is-primary" hx-get="{{url_for('api.attendance_list',course_id=course_id,date=date,random=True)}}" hx-trigger="click" hx-target="#lista" >Random order</a>
+
+
 <p>
 <table class="table">
     <thead>
@@ -21,26 +24,7 @@ Assistencia
     <th>Status</th>
     </tr>
     </thead>
-    <tbody>
-    {% for s,a in students %}
-    <tr>
-    <td><a href="">{{s.firstname}} {{s.lastname}}</a></td>
-    <td><a class="button is-success{% if not a.status=="present"%} is-light{% endif %}"
-           hx-get="{{url_for('api.change_status_attendance',status='present',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
-            >Presente</a> </td>
-    <td><a class="button is-danger{% if not a.status=="absent"%} is-light{% endif %}"
-           hx-get="{{url_for('api.change_status_attendance',status='absent',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
-            >Ausente</a> </td>
-    <td><a class="button is-warning{% if not a.status=="late"%} is-light{% endif %}"
-           hx-get="{{url_for('api.change_status_attendance',status='late',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
-            >Retardo</a> </td>
-    <td><a class="button is-info{% if not a.status=="justified"%} is-light{% endif %}"
-           hx-get="{{url_for('api.change_status_attendance',status='justified',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
-            >Jusitificado</a> </td>
- 
-    <td id="status-{{loop.index}}">{{a.status}}</td>
-    <tr>
-    {% endfor %}
+    <tbody id="lista" hx-get="{{url_for('api.attendance_list',course_id=course_id,date=date)}}" hx-trigger="load">
     </tbody>
 </table>
 </p>

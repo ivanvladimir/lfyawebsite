@@ -18,6 +18,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from .forms import *
 from .model import *
 import time
+import random
+import humanize
 from .database import mongo
 from bson.objectid import ObjectId
 
@@ -115,13 +117,12 @@ def attendance_list(course_id):
     course = courses.find_one_by({"course_id": course_id})
     days = attendance.find_by({"course": str(course.id)})
     days = set(d.date for d in days)
-    days = sorted(days)
+    days = [(d,humanize.naturaldate(d)) for d in sorted(days,reverse=True)]
 
     return render_template(
         "teacher/attendance_list.html",
         days=days,
         form=form,
-        course_id_=str(course.id),
         course_id=course_id,
         elapsed_time_seconds=f"{elapsed_time():2.3f}",
     )
@@ -138,13 +139,14 @@ def attendance_date(course_id, date):
     date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     course = courses.find_one_by({"course_id": course_id})
     student_ids = course_student.find_by({"course": str(course.id)})
-    students = [
-        (
-            users.find_one_by_id(ObjectId(s.student)),
-            attendance.find_one_by({"student": s.student}),
-        )
+    attendance_student=attendance.find_by({"date": date})
+    students_ = {
+            s.student:users.find_one_by_id(ObjectId(s.student))
         for s in student_ids
-    ]
+    }
+    students = [(students_[a_s.student],a_s)
+            for a_s in attendance_student
+            ]
 
     students = sorted(students, key=lambda s: s[0].firstname)
 

@@ -29,8 +29,8 @@ Listas de assistencias
 
 <h1>Listas de assistencias</h1>
 <ul id="day-list">
-    {% for d in days %}
-    <li><a href="{{url_for('teacher.attendance_date',course_id=course_id, date=d)}}">{{d}}</a></li>
+    {% for d,h in days %}
+    <li><a href="{{url_for('teacher.attendance_date',course_id=course_id, date=d)}}">{{h}}</a></li>
     {% endfor %}
 </ul>
 
