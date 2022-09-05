@@ -101,6 +101,7 @@ def list(course_id):
         "teacher/list.html",
         students=students,
         course_id=course_id,
+        course_id_=course.id,
         elapsed_time_seconds=f"{elapsed_time():2.3f}",
     )
 
@@ -124,6 +125,7 @@ def attendance_list(course_id):
         days=days,
         form=form,
         course_id=course_id,
+        course_id_=course.id,
         elapsed_time_seconds=f"{elapsed_time():2.3f}",
     )
 
