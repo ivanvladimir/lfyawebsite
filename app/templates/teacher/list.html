@@ -16,19 +16,22 @@ Participación
 
 <h1>Lista de estudiantes</h1>
 <p>
+ <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombres" class="input is-primary">
+</p>
+<p>
 <table class="table">
     <thead>
     <tr>
     <th>Nombre</th>
-    <th><button class="button is-success">+</button></th>
-    <th><button class="button is-danger">-</button></th>
+    <th>Incrementar</th>
+    <th>Decrementar</th>
     <th>Total</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="searchable_bit">
     {% for s,points,course_student_id in students %}
-    <tr>
-    <td><a href="">{{s.firstname}} {{s.lastname}}</a></td>
+    <tr class="row">
+    <td><a class="name" href="">{{s.firstname}} {{s.lastname}}</a></td>
     <td><a hx-get="{{url_for('api.add',course_student_id=course_student_id)}}" hx-target="#points-{{loop.index}}"  class="button is-success">+</a></td>
     <td><a hx-get="{{url_for('api.substract',course_student_id=course_student_id)}}" hx-target="#points-{{loop.index}}"  class="button is-danger">-</a></td>
     <td id="points-{{loop.index}}">{{points}}</td>
@@ -37,5 +40,27 @@ Participación
     </tbody>
 </table>
 </p>
+
+<script>
+    function filterByName() {
+            // Declare variables
+            var input, filter, el, a, name, txtValue;
+            input = document.getElementById('search_table');
+            filter = input.value.toUpperCase();
+            elements = document.getElementsByClassName('row');
+
+            // Loop through all list items, and hide those who don't match the search query
+            for(var i = 0; i < elements.length; i++) {
+                var el = elements[i];
+                a=el.getElementsByClassName("name")[0];
+                name = a.textContents || a.innerText;
+                if (name.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+    }
+</script>
 
 {% endblock %}

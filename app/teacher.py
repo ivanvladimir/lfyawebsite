@@ -62,9 +62,13 @@ def login(url):
     if user:
         login_user(user)
         access_token = create_access_token(identity=str(user.id))
+        groups_ids = course_teacher.find_by({"teacher": str(current_user.id)})
+        groups = [courses.find_one_by_id(ObjectId(g.course)) for g in groups_ids]
         response = make_response(
             render_template(
-                "teacher/home.html", elapsed_time_seconds=f"{elapsed_time():2.3f}"
+                "teacher/home.html",
+                groups=groups,
+                elapsed_time_seconds=f"{elapsed_time():2.3f}"
             )
         )
         set_access_cookies(response, access_token)
