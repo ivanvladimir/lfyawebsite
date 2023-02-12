@@ -228,6 +228,13 @@ def create_app(test_config=None):
         )
         courses.save(course)
 
+    @course_cli.command("list")
+    def list_course():
+        courses = CourseRepository(database=mongo.db)
+
+        for c in courses.find_by({}):
+            print(f"{c.course_id:>10} : {c.course_name}")
+
     @student_cli.command("import")
     @click.argument("csv_filename")
     @click.argument("course_id")
