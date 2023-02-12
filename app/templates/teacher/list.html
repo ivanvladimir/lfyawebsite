@@ -15,9 +15,14 @@ Participación
 <hr/>
 
 <h1>Lista de estudiantes</h1>
-<p>
- <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombres" class="input is-primary">
-</p>
+<div class="field has-addons">
+    <div class="control is-expanded">
+        <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombres" class="input is-primary">
+    </div>
+    <div class="control">
+        <button type="submit" onclick="cleanInput()"  class="button is-danger">Borrar</button>
+    </div>
+</div>
 <p>
 <table class="table">
     <thead>
@@ -61,6 +66,16 @@ Participación
                 }
             }
     }
+
+    function cleanInput() {
+            // Declare variables
+            var input;
+            input = document.getElementById('search_table');
+            input.value="";
+            filterByName();
+    }
+
+
 </script>
 
 {% endblock %}

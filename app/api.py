@@ -132,7 +132,6 @@ def attendance_list(course_id,date):
         <tr>"""
         bits.append(s)
     return "\n".join(bits)
- 
 
 @api.route("/status/<status>/<attendance_id>")
 @jwt_required()
