@@ -169,6 +169,26 @@ def create_app(test_config=None):
         )
         users.save(user)
 
+
+    @user_cli.command("list")
+    def list():
+        users = UserRepository(database=mongo.db)
+        for user in users.find_by({}):
+            print(user.firstname, user.lastname, user.email)
+
+    @user_cli.command("list_teachers")
+    @click.argument("course_id")
+    def list_teachers(course_id):
+        course_teacher = CourseTeacherRepository(database=mongo.db)
+        groups_ids = course_teacher.find_by({"couse_id": course_id})
+        if not groups_ids:
+            print(f"Error {course_id} course not found")
+            return
+        users = UserRepository(database=mongo.db)
+        for group_id in groups_ids:
+            user = users.find_by({"teacher":group_id.teacher})
+            print(user)
+
     @user_cli.command("assign")
     @click.argument("email")
     @click.argument("course_id")
