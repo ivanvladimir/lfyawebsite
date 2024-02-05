@@ -30,7 +30,6 @@ admin = Blueprint("admin", __name__)
 
 users = UserRepository(database=mongo.db)
 
-
 @admin.route("/")
 def index():
     #  Time
@@ -63,13 +62,11 @@ def login():
             )
             set_access_cookies(response, access_token)
             return response
-
         else:
             return 404
     return render_template(
         "admin/login.html", form=form, elapsed_time_seconds=f"{elapsed_time():2.3f}"
     )
-
 
 @admin.route("/logout")
 def logout():
@@ -77,7 +74,6 @@ def logout():
     response = make_response(redirect(url_for("admin.login")))
     unset_jwt_cookies(response)
     return response
-
 
 @admin.route("/mail_to", methods=["GET", "POST"])
 @login_required

@@ -68,9 +68,11 @@ def substract(course_student_id):
 @jwt_required()
 def create_attendance(course_id):
     """Changin points"""
+    course = courses.find_one_by_id(ObjectId(course_id))
     students = course_student.find_by({"course": course_id})
 
     date = request.form["date"]
+    atts =[]
     for s in students:
         gt = datetime.utcnow()
         att = Attendance(
@@ -81,13 +83,15 @@ def create_attendance(course_id):
             created=gt,
             modified=gt,
         )
-        attendance.save(att)
+        atts.append(att)
+    attendance.save_many(atts)
 
     days = attendance.find_by({"course": course_id})
     days = list(set(d.date.date() for d in days))
     days = sorted(days,reverse=True)
 
-    days = ['<li><a href="{url_for("teacher.attendance_date",course_id=course_id, date=d)}">{humanize.naturaldate(d)}</a></li>' for d in sorted(days)]
+    days = [f'<li><a href="{url_for("teacher.attendance_date",course_id=course.course_id, date=datetime.strftime(date, "%Y-%m-%d %H:%M:%S"))}">{humanize.naturaldate(d)}</a></li>' 
+            for d in days]
 
     return "\n".join(days)
 
@@ -114,8 +118,8 @@ def attendance_list(course_id,date):
 
     bits=[]
     for index,(s,a) in enumerate(students):
-        s=f"""<tr>
-        <td><a href="">{s.firstname} {s.lastname}</a></td>
+        s=f"""<tr class="row">
+        <td><a class="name"  href="">{s.firstname} {s.lastname}</a></td>
         <td><a class="button is-success {'is-light' if not a.status=='present' else '' }"
            hx-get="{url_for('api.change_status_attendance',status='present',attendance_id=a.id)}" hx-target='#status-{index}'
             >Presente</a> </td>

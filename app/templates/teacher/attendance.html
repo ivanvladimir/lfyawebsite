@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends 'teacher/base.html' %}
 
 {% block title %}
 Assistencia
@@ -6,14 +6,20 @@ Assistencia
 
 {% block content %}
 
-
 <h1>Estudiantes</h1>
 
-<a class="button is-primary" hx-get="{{url_for('api.attendance_list',course_id=course_id,date=date,random=True)}}" hx-trigger="click" hx-target="#lista" >Random order</a>
+<a class="button is-primary" onclick="randomTable()" >Random order</a>
 
-
+<div class="field has-addons">
+    <div class="control is-expanded">
+        <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombres" class="input is-primary">
+    </div>
+    <div class="control">
+        <button type="submit" onclick="cleanInput()"  class="button is-danger">Borrar</button>
+    </div>
+</div>
 <p>
-<table class="table">
+<table id="student_list" class="search_table">
     <thead>
     <tr>
     <th>Nombre</th>
@@ -24,9 +30,72 @@ Assistencia
     <th>Status</th>
     </tr>
     </thead>
-    <tbody id="lista" hx-get="{{url_for('api.attendance_list',course_id=course_id,date=date)}}" hx-trigger="load">
+    <tbody id="lista" hx-get="{{url_for('api.attendance_list',course_id=course_id,date=date)}}" hx-trigger="load" hx-indicator="#indicator_list">
     </tbody>
+    <img width="48" id="indicator_list" class="htmx-indicator" src="{{ url_for('static', filename='spinner.svg') }}"/>
 </table>
 </p>
+
+
+<script>
+    function filterByName() {
+            // Declare variables
+            var input, filter, el, a, name, txtValue;
+            input = document.getElementById('search_table');
+            filter = input.value.toUpperCase();
+            elements = document.getElementsByClassName('row');
+
+            // Loop through all list items, and hide those who don't match the search query
+            for(var i = 0; i < elements.length; i++) {
+                var el = elements[i];
+                a=el.getElementsByClassName("name")[0];
+                name = a.textContents || a.innerText;
+                if (name.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+    }
+
+    function randomTable() {
+          let table = document.getElementById("student_list");
+
+          //1. get all rows
+          let rowsCollection = table.querySelectorAll("tr");
+
+          //2. convert to array
+          let rows = Array.from(rowsCollection)
+            .slice(1); //skip the header row
+
+          //3. shuffle
+          shuffleArray(rows);
+
+          //4. add back to the DOM
+          for (const row of rows) {
+                  table.appendChild(row);
+                }
+    }
+
+    const shuffleArray = array => {
+          for (let i = array.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  const temp = array[i];
+                  array[i] = array[j];
+                  array[j] = temp;
+                }
+    }
+
+    function cleanInput() {
+            // Declare variables
+            var input;
+            input = document.getElementById('search_table');
+            input.value="";
+            filterByName();
+    }
+
+</script>
+
+
 
 {% endblock %}

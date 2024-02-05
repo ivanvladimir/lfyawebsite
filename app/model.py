@@ -29,7 +29,7 @@ class User(BaseModel):
     prefered_name: Optional[str]
     prefered_pronoun: Optional[str]
     url: Optional[str]
-    password: str = None
+    password: Optional[str]
     created: datetime
     modified: datetime
     active: bool = True
@@ -70,11 +70,9 @@ class Course(BaseModel):
     finishin_time: Optional[time]
     active: bool = True
 
-
 class CourseRepository(AbstractRepository[Course]):
     class Meta:
         collection_name = "courses"
-
 
 class CourseTeacher(BaseModel):
     id: ObjectIdField = None
@@ -109,7 +107,7 @@ class Attendance(BaseModel):
     id: ObjectIdField = None
     student: str
     course: str
-    observations: Optional[str]
+    observations: Optional[str] = None
     date: datetime
     status: AttendanceEnum
     created: datetime

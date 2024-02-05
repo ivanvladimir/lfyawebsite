@@ -50,7 +50,7 @@ def create_app(test_config=None):
     cors = CORS()
 
     # create app
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path="/lfya/static", static_folder="static")
     user_cli = AppGroup("user")
     admin_cli = AppGroup("admin")
     course_cli = AppGroup("course")
@@ -82,18 +82,18 @@ def create_app(test_config=None):
     from .admin import admin
     from .teacher import teacher
 
-    app.register_blueprint(main, static_url_path="/static", static_folder="static")
+    app.register_blueprint(main, static_url_path="/lfya/static", static_folder="static", url_prefix="/lfya")
     app.register_blueprint(
-        admin, static_url_path="/static", static_folder="static", url_prefix="/admin"
+        admin, static_url_path="/lfya/static", static_folder="static", url_prefix="/lfya/admin"
     )
     app.register_blueprint(
         teacher,
-        static_url_path="/static",
+        static_url_path="/lfya/static",
         static_folder="static",
-        url_prefix="/teacher",
+        url_prefix="/lfya/teacher",
     )
 
-    app.register_blueprint(api, url_prefix="/api")
+    app.register_blueprint(api, url_prefix="/lfya/api")
 
     users = UserRepository(database=mongo.db)
 
@@ -268,7 +268,7 @@ def create_app(test_config=None):
             users = UserRepository(database=mongo.db)
 
             with open(csv_filename) as csv_file:
-                csv = list(csv.reader(csv_file, delimiter=","))
+                csv = [l for l in csv.reader(csv_file, delimiter=",")]
 
             for r in tqdm.tqdm(csv):
                 dt = datetime.utcnow()

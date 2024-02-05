@@ -16,7 +16,6 @@ main = Blueprint("main", __name__)
 
 users = UserRepository(database=mongo.db)
 
-
 @main.route("/")
 def index():
     #  Time

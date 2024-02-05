@@ -44,6 +44,8 @@ def index():
     if current_user.is_authenticated:
         groups_ids = course_teacher.find_by({"teacher": str(current_user.id)})
         groups = [courses.find_one_by_id(ObjectId(g.course)) for g in groups_ids]
+        groups.sort(key=lambda g: g.created)
+        groups.sort(key=lambda g: g.created, reverse = True)
         return render_template(
             "teacher/home.html",
             groups=groups,
@@ -64,6 +66,7 @@ def login(url):
         access_token = create_access_token(identity=str(user.id))
         groups_ids = course_teacher.find_by({"teacher": str(current_user.id)})
         groups = [courses.find_one_by_id(ObjectId(g.course)) for g in groups_ids]
+        groups.sort(key=lambda g: g.created, reverse = True)
         response = make_response(
             render_template(
                 "teacher/home.html",
@@ -108,7 +111,6 @@ def list(course_id):
         course_id_=course.id,
         elapsed_time_seconds=f"{elapsed_time():2.3f}",
     )
-
 
 @teacher.route("/<course_id>/attendance/list", methods=["GET"])
 @login_required
