@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "lfyawebsite"
+version = "0.1.2"
+description = "Sitio web para el curso de LFyA de FI-UNAM"
+authors = ["Ivan Vladimir Meza Ruiz <ivanvladimir@gmail.com>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.1"
+pymongo = "^4.8.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
