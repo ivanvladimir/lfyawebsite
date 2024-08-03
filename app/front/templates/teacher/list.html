@@ -1,0 +1,80 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}
+Participación
+{% endblock %}
+
+{% block content %}
+
+<h1>Acciones</h1>
+<center>
+    <a href="{{url_for('attendance_list_teacher',course_id=course_id)}}" class="button is-info">Ir a assistencias</a>
+</center>
+
+<hr/>
+
+<h1>Lista de estudiantes</h1>
+<div class="field has-addons">
+    <div class="control is-expanded">
+        <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombres" class="input is-primary">
+    </div>
+    <div class="control">
+        <button type="submit" onclick="cleanInput()"  class="button is-danger">Borrar</button>
+    </div>
+</div>
+<p>
+<table class="table">
+    <thead>
+    <tr>
+    <th>Nombre</th>
+    <th>Incrementar</th>
+    <th>Decrementar</th>
+    <th>Total</th>
+    </tr>
+    </thead>
+    <tbody id="searchable_bit">
+    {% for s,points,course_student_id in students %}
+    <tr class="row">
+    <td><a class="name" href="">{{s.firstname}} {{s.lastname}}</a></td>
+    <td><a hx-get="{#{url_for('api.add',course_student_id=course_student_id)}#}" hx-target="#points-{{loop.index}}"  class="button is-success">+</a></td>
+    <td><a hx-get="{#{url_for('api.substract',course_student_id=course_student_id)}#}" hx-target="#points-{{loop.index}}"  class="button is-danger">-</a></td>
+    <td id="points-{{loop.index}}">{{points}}</td>
+    <tr>
+    {% endfor %}
+    </tbody>
+</table>
+</p>
+
+<script>
+    function filterByName() {
+            // Declare variables
+            var input, filter, el, a, name, txtValue;
+            input = document.getElementById('search_table');
+            filter = input.value.toUpperCase();
+            elements = document.getElementsByClassName('row');
+
+            // Loop through all list items, and hide those who don't match the search query
+            for(var i = 0; i < elements.length; i++) {
+                var el = elements[i];
+                a=el.getElementsByClassName("name")[0];
+                name = a.textContents || a.innerText;
+                if (name.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+    }
+
+    function cleanInput() {
+            // Declare variables
+            var input;
+            input = document.getElementById('search_table');
+            input.value="";
+            filterByName();
+    }
+
+
+</script>
+
+{% endblock %}

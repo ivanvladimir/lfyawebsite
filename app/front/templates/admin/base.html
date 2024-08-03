@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block extra_buttons %}
+	<div class="navbar-item">
+        <div class="buttons">
+		{% if current_user %}
+          <a class="button is-primary" href="{{url_for('logout')}}">
+              Salir
+          </a>
+		{% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block header %}
+    <p class="title">
+        Bienvenido al sitio de LFyA
+    </p>
+    <p class="subtitle">
+        Ingresa al sitio para ver las opciones como administrador.
+    </p>
+{% endblock %}
+

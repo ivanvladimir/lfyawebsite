@@ -1,0 +1,73 @@
+import uuid
+from typing import Any, List
+
+from bson.objectid import ObjectId
+
+from app.models import User, UserEnum, Course
+from app.core.db import user_collection, course_student_collection, course_teacher_collection, course_collection
+
+async def create_user(firstname: str, lastname:str, email:str, role: UserEnum)  -> User:
+    dt = datetime.utcnow()
+    user = User(
+            role=role,
+            email=email,
+            lastname=lastname,
+            firstname=firstname,
+            url=str(uuid.uuid4()),
+            created=dt,
+            modified=dt,
+        )
+    new_user = await user_collection.insert_one(
+        user.model_dump(by_alias=True, exclude=["id"])
+    )
+    created_user = await user_collection.find_one(
+        {"_id": new_user.inserted_id}
+    )
+    return created_user
+
+async def get_user(user_id:str) -> User | None:
+    user = await user_collection.find_one(
+        {"_id": ObjectId(user_id)}
+    )
+    if user:
+        user['id']=user['_id']
+        return User(**user)
+    return user
+
+def dict2course(g:dict ) -> Course:
+    g['id']=g['_id']
+    return Course(**g)
+
+def dict2user(g:dict ) -> User:
+    g['id']=g['_id']
+    return User(**g)
+
+async def get_groups_teacher(user: User) -> List[Course]:
+    groups_ids = course_teacher_collection.find({"teacher": str(user.id)})
+    groups = [await course_collection.find_one(ObjectId(g['course'])) 
+        for g in await groups_ids.to_list(100)]
+    return [dict2course(g) for g in groups]
+
+async def get_students_from_course(course_id: str) -> List[User]:
+    course = await course_collection.find_one({"course_id": course_id})
+    course = dict2course(course)
+    student_ids = course_student_collection.find({"course": str(course.id)})
+    students = [
+            (await user_collection.find_one(ObjectId(s['student'])), s['participation'], str(s["_id"]))
+            for s in await student_ids.to_list(100)
+        ]
+    return [ (dict2user(a),b,c) for a,b,c in students], course
+
+
+
+async def get_user_by_email(email: str) -> User | None:
+    await user_collection.find_one({"email": email})
+    return session_user
+
+async def authenticate(secret_url:str) -> User | None:
+    user = await user_collection.find_one({"url": secret_url})
+    user['id']=user['_id']
+    if user:
+        return User(**user)
+    else:
+        return None
