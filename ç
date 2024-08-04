@@ -52,8 +52,9 @@ async def get_students_from_course(course_id: str) -> List[User]:
     course = await course_collection.find_one({"course_id": course_id})
     course = dict2course(course)
     student_ids = course_student_collection.find({"course": str(course.id)})
-    course_student_info = {ObjectId(student_info['student']):student_info for student_info in await student_ids.to_list(100) }
-    students = user_collection.find({"_id": {"$in": [k for k in course_student_info.keys()]}})
+    course_student_info = {student_info['student']:student_info for student_info in await student_ids.to_list(100) }
+    students = user_collection.find({"_id": {"$in": list(course_student_info.keys())}})
+    
     return [ (dict2user(s),course_student_info[s["_id"]]['participation'],s["_id"]) for s in await students.to_list(100)], course
 
 async def get_user_by_email(email: str) -> User | None:
