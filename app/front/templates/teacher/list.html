@@ -36,8 +36,8 @@ Participación
     {% for s,points,course_student_id in students %}
     <tr class="row">
     <td><a class="name" href="">{{s.firstname}} {{s.lastname}}</a></td>
-    <td><a hx-get="{#{url_for('api.add',course_student_id=course_student_id)}#}" hx-target="#points-{{loop.index}}"  class="button is-success">+</a></td>
-    <td><a hx-get="{#{url_for('api.substract',course_student_id=course_student_id)}#}" hx-target="#points-{{loop.index}}"  class="button is-danger">-</a></td>
+    <td><a hx-get="{{url_for('add_participation_teacher',course_student_id=course_student_id)}}" hx-target="#points-{{loop.index}}"  class="button is-success">+</a></td>
+    <td><a hx-get="{{url_for('substract_participation_teacher',course_student_id=course_student_id)}}" hx-target="#points-{{loop.index}}"  class="button is-danger">-</a></td>
     <td id="points-{{loop.index}}">{{points}}</td>
     <tr>
     {% endfor %}

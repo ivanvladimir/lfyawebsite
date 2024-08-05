@@ -1,0 +1,37 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Listas de assistencias
+{% endblock %}
+
+{% block content %}
+
+<h1>Crear lista de assistencias</h1>
+
+<form hx-post="{#{url_for('api.create_attendance',course_id=course_id_)}#}" hx-target="#day-list" hx-indicator="#indicator_attendance">
+    {{ form.csrf_token }}
+
+    <div class="field">
+        <label class="label">{{ form.date.label }}</label>
+        <div class="control">
+        {{ form.date(type='text') }}
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button 
+                id="send-button" type="submit" value="send" class="button is-link">Crear</button>
+        </div>
+    </div>
+</form>
+<img width="48" id="indicator_attendance" class="htmx-indicator" src="{#{ url_for('static', filename='spinner.svg') }#}"/>
+
+<h1>Dias de clase</h1>
+<ul id="day-list">
+    {% for d,h in days %}
+    <li><a href="{{url_for('attendance_modify_teacher',course_id=course_id, date=d)}}">{{h}}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
