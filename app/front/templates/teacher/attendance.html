@@ -8,7 +8,7 @@ Listas de assistencias
 
 <h1>Crear lista de assistencias</h1>
 
-<form hx-post="{#{url_for('api.create_attendance',course_id=course_id_)}#}" hx-target="#day-list" hx-indicator="#indicator_attendance">
+<form hx-post="{{url_for('attendance_create_teacher',course_id=course_id)}}" hx-target="#day-list" hx-indicator="#indicator_attendance"  hx-swap="afterbegin">
     {{ form.csrf_token }}
 
     <div class="field">

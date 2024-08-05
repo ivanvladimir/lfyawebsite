@@ -106,4 +106,21 @@ async def update_course_student(course_student_id,course_student_update) -> Any:
         {"_id":ObjectId(course_student_id)},
         {"$set": course_student_update})
  
+async def get_course_student_date(course_student_id: str, date: str) -> Any:
+    res= await course_student_collection.find_one(
+        {"_id": ObjectId(course_student_id)})
+    return res
+
+async def exists_date_course(course_id: str, date: datetime) -> Any:
+    res= await course_student_collection.find_one(
+        {"course": course_id,
+         "date": date
+         })
+    if res:
+        True
+    else:
+        False
+    return res
+
+
 
