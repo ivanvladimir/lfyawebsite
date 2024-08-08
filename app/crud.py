@@ -111,16 +111,15 @@ async def get_course_student_date(course_student_id: str, date: str) -> Any:
         {"_id": ObjectId(course_student_id)})
     return res
 
-async def exists_date_course(course_id: str, date: datetime) -> Any:
-    res= await course_student_collection.find_one(
-        {"course": course_id,
-         "date": date
-         })
-    if res:
-        True
-    else:
-        False
-    return res
+async def exists_date_course(course_id: str, date: str) -> Any:
+    date_=datetime.datetime.strptime(date, "%d/%m/%Y")
+    course = await course_collection.find_one({"course_id": course_id})
+    course = dict2course(course)
+    res= await attendance_collection.find_one(
+        {"course": str(course.id),
+         "date": date_})
+    return True if res else False
 
-
-
+async def add_attendances(atts : List[Attendance]) -> Any:
+    return await attendance_collection.insert_many([att.model_dump() for att in atts])
+    

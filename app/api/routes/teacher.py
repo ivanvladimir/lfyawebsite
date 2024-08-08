@@ -27,7 +27,8 @@ async def add_participation_teacher(course_student_id: str, request:Request, cur
             'modified':datetime.datetime.utcnow()
         }
         await crud.update_course_student(course_student['_id'],course_student_)
-        return f"<strong>{int(course_student_['participation'])}</strong>"
+        msg = f"<strong>{int(course_student_['participation'])}</strong>"
+        return HTMLResponse(content=msg,status_code=200)
     else:
         raise HTTPException(status_code=401, detail="Not authorized")
 
@@ -43,36 +44,46 @@ async def substract_participation_teacher(course_student_id: str, request:Reques
             'modified':datetime.datetime.utcnow()
         }
         await crud.update_course_student(course_student['_id'],course_student_)
-        return f"<strong>{int(course_student_['participation'])}</strong>"
+        msg = f"<strong>{int(course_student_['participation'])}</strong>"
+        return HTMLResponse(content=msg,status_code=200)
     else:
         raise HTTPException(status_code=401, detail="Not authorized")
 
 @router.post("/attendance/create/{course_id}")
-async def attendance_create_teacher(course_id: str, date: Annotated[str, Form()], request:Request, current_user: CurrentUser, response_class=HTMLResponse) -> HTMLResponse:
+async def attendance_create_api_teacher(course_id: str, date: Annotated[str, Form()], request:Request, current_user: CurrentUser, response_class=HTMLResponse) -> HTMLResponse:
     """
     Create attendance for a class
     """
     if current_user.role is UserEnum.teacher:
-        #if await crud.exists_date_course(course_id=course_id,date=date):
-        #    raise HTTPException(status_code=403, detail="Date already exists")
+        if await crud.exists_date_course(course_id=course_id,date=date):
+            raise HTTPException(status_code=403, detail="Date already exists")
         students,course = await crud.get_students_from_course(str(course_id))
         
         atts =[]
+        date_=datetime.datetime.strptime(date, "%d/%m/%Y")
         for s,_,_ in students:
             gt = datetime.datetime.utcnow()
             att = Attendance(
                 student=str(s.id),
                 course=str(course.id),
-                date=datetime.datetime.strptime(date, "%d/%m/%Y"),
+                date=date_,
                 status=AttendanceEnum.present,
                 created=gt,
                 modified=gt,
             )
             atts.append(att)
-        msg= f"<li hx-swap-oob='true'><a href='/class/teacher/{course_id}/attendance/modify/{date.replace('/','-')}%2000:00:00'>{date}</a></li>"
+        result = await crud.add_attendances(atts)
+        msg= f"<li><a href='/class/teacher/{course_id}/attendance/modify/{date_}'><strong>{date}</strong></a></li>"
         return HTMLResponse(content=msg,status_code=200)
     else:
         raise HTTPException(status_code=401, detail="Not authorized")
+
+
+
+
+
+
+
 
 
 
