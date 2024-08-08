@@ -4,7 +4,7 @@ from typing import Any, List
 
 from bson.objectid import ObjectId
 
-from app.models import User, UserEnum, Course, Attendance
+from app.models import User, UserEnum, Course, Attendance, AttendanceEnum
 from app.core.db import user_collection, course_student_collection, course_teacher_collection, course_collection, attendance_unique_dates, attendance_collection
 
 async def create_user(firstname: str, lastname:str, email:str, role: UserEnum)  -> User:
@@ -122,4 +122,18 @@ async def exists_date_course(course_id: str, date: str) -> Any:
 
 async def add_attendances(atts : List[Attendance]) -> Any:
     return await attendance_collection.insert_many([att.model_dump() for att in atts])
-    
+
+async def get_attendance(attendance_id: str) -> Attendance:
+    att = await attendance_collection.find_one({'_id':ObjectId(attendance_id)})
+    return dict2attendance(att)
+   
+async def update_attendance(attendance_id: ObjectId, status: AttendanceEnum, modified: datetime) -> Any:
+    att = await attendance_collection.update_one(
+        {
+            '_id':ObjectId(attendance_id)},
+        { "$set":{
+            'status':status,
+            'modified':modified}
+        })
+    return att
+ 

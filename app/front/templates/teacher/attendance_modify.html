@@ -34,19 +34,19 @@ Modificar asistencia
     {%for (s,a) in students %}
     <tr class="row">
         <td><a class="name"  href="">{{s.firstname}} {{s.lastname}}</a></td>
-        <td><a class="button is-success {'is-light' if not a.status=='present' else '' }"
-           hx-get="{#url_for('api.change_status_attendance',status='present',attendance_id=a.id)#}" hx-target='#status-{index}'
+<td><a class="button is-success {{'is-light' if not a.status=='present' else '' }}"
+hx-get="{{url_for('change_status_attendance_api_teacher',status='present',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
             >Presente</a> </td>
-        <td><a class="button is-danger {'is-light' if not a.status=='absent' else '' }"
-           hx-get="{#url_for('api.change_status_attendance',status='absent',attendance_id=a.id)#}" hx-target='#status-{index}'
+<td><a class="button is-danger {{'is-light' if not a.status=='absent' else '' }}"
+hx-get="{{url_for('change_status_attendance_api_teacher',status='absent',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
             >Ausente</a> </td>
-        <td><a class="button is-warning {'is-light' if not a.status=='late' else '' }"
-           hx-get="{#url_for('api.change_status_attendance',status='late',attendance_id=a.id)#}" hx-target='#status-{index}'
+<td><a class="button is-warning {{'is-light' if not a.status=='late' else '' }}"
+hx-get="{{url_for('change_status_attendance_api_teacher',status='late',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
             >Retardo</a> </td>
-        <td><a class="button is-info {'is-light' if not a.status=='justified' else '' }"
-           hx-get="{#url_for('api.change_status_attendance',status='justified',attendance_id=a.id)#}" hx-target='#status-{index}'
+<td><a class="button is-info {{'is-light' if not a.status=='justified' else '' }}" 
+hx-get="{{url_for('change_status_attendance_api_teacher',status='justified',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
             >Jusitificado</a> </td>
-        <td id="status-{loop.index}">{{a.status}}</td>
+<td id="status-{{loop.index}}">{{a.status | string}}</td>
     </tr>
     {% endfor %}
     <!-- <tbody id="lista" hx-get="{#{url_for('api.attendance_list',course_id=course_id,date=date)}#}" hx-trigger="load" hx-indicator="#indicator_list"> -->

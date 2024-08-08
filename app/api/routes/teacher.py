@@ -78,6 +78,25 @@ async def attendance_create_api_teacher(course_id: str, date: Annotated[str, For
     else:
         raise HTTPException(status_code=401, detail="Not authorized")
 
+@router.get("/status/{status}/{attendance_id}")
+async def change_status_attendance_api_teacher(status: str, attendance_id: str, request:Request, current_user: CurrentUser, response_class=HTMLResponse) -> HTMLResponse:
+    """Changin status assitance"""
+    if current_user.role is UserEnum.teacher:
+        att = await crud.get_attendance(attendance_id)
+        if status == "present":
+            att.status = AttendanceEnum.present
+        if status == "justified":
+            att.status = AttendanceEnum.justificated
+        if status == "absent":
+            att.status = AttendanceEnum.absent
+        if status == "late":
+            att.status = AttendanceEnum.late
+
+        await crud.update_attendance(attendance_id=str(att.id), status=att.status, modified=datetime.datetime.utcnow())
+        msg = f"<strong>{status}</strong>"
+        return HTMLResponse(content=msg,status_code=200)
+    else:
+        raise HTTPException(status_code=401, detail="Not authorized")
 
 
 
