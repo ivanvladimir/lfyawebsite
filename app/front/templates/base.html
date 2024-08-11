@@ -6,7 +6,7 @@
     <title>{% block title %}{% endblock %} - LFyA </title>
     <script defer src="https://friconix.com/cdn/friconix.js"> </script> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <!--- <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}"> -->
     <script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     {% block extra_links %}{% endblock %}
@@ -54,6 +54,18 @@
 
     <div class="navbar-end">
     {% block extra_buttons %}{% endblock %}
+	  <div class="navbar-item">
+		{% if current_user %}
+      <a class="navbar-item">
+      <i class="fi-xnsuxl-user-solid"></i>{{current_user.firstname}}
+      </a>
+        <div class="buttons">
+          <a class="button is-warning" href="{{url_for('logout')}}">
+              Salir
+          </a>
+        </div>
+		{% endif %}
+    </div>
     </div>
 
   </div>
@@ -61,8 +73,12 @@
 <section class="hero is-primary">
   <div class="hero-body">
   <div class="column is-half is-offset-1">
-  {% block header %}{% endblock %}
-  {% block subheader %}{% endblock %}
+    <p class="title">
+      Lenguajes Formales y Autómatas
+    </p>
+    <p class="subtitle">
+    {% block subheader %}{% endblock %}
+    </p>
   </div>
   </div>
 </section>

@@ -1,21 +1,2 @@
 {% extends 'base.html' %}
 
-{% block extra_buttons %}
-	<div class="navbar-item">
-        <div class="buttons">
-		{% if current_user %}
-          <a class="button is-warning" href="{{url_for('logout')}}">
-              Salir
-          </a>
-		{% endif %}
-        </div>
-    </div>
-{% endblock %}
-
-
-{% block header %}
-    <p class="title">
-      Lenguajes Formales y Autómatas
-    </p>
-{% endblock %}
-
