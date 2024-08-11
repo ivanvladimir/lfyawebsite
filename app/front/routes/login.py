@@ -23,7 +23,7 @@ async def index(request: Request) -> RedirectResponse:
     Logs in user if has the correct url
     """
     return templates.TemplateResponse(
-        request=request, name="index.html", context={}
+        request=request, name="public/index.html", context={}
     )
 
 @router.get("/login/{secret_url}")
@@ -40,7 +40,7 @@ async def login_url(request: Request, secret_url) -> HTMLResponse:
             subject=user.id, expires_delta=access_token_expires
         )
         if user.role is UserEnum.teacher:
-            response=RedirectResponse(url=request.url_for('teacher_home'))
+            response=RedirectResponse(url=request.url_for('home_teacher'))
         else:
             raise HTTPException(status_code=400, detail="Incorrect url")
         response.set_cookie(key="session", value=access_token)

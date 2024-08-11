@@ -13,19 +13,6 @@
 </head>
 <body>
 <section class="content">
-	<script>
-	function getCookie(name) {
-	  const value = `; ${document.cookie}`;
-	  const parts = value.split(`; ${name}=`);
-	  if (parts.length === 2) return parts.pop().split(';').shift();
-	}
-
-	document.body.addEventListener('htmx:configRequest', function(evt) {
-		evt.detail.credentials= 'same-origin',
-		evt.detail.headers['X-CSRF-TOKEN'] = getCookie('csrf_access_token'); // add a new header into the request
-	});
-	</script>
-
   <header>
   <nav class="navbar" role="navigation" aria-label="main navigation"o>
   <div class="navbar-brand">
@@ -42,20 +29,13 @@
 
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
-        <a class="navbar-item" href="{{url_for('index')}}">
-        Cursos
-      </a>
-
-      <a class="navbar-item" href="{{url_for('index')}}" >
-        Tareas
-      </a>
-    {% block extra_options %}{% endblock %}
+    {% block menu%}{% endblock %}
     </div>
 
     <div class="navbar-end">
     {% block extra_buttons %}{% endblock %}
 	  <div class="navbar-item">
-		{% if current_user %}
+		{% if current_user and current_user is not none%}
       <a class="navbar-item">
       <i class="fi-xnsuxl-user-solid"></i>{{current_user.firstname}}
       </a>

@@ -2,6 +2,8 @@ import time
 from datetime import timedelta
 from typing import Annotated, Any
 import humanize
+import markdown
+import os
 
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse
@@ -20,7 +22,7 @@ templates = Jinja2Templates(directory="app/front/templates")
 router = APIRouter()
 
 @router.get("/")
-async def teacher_home(request:Request, current_user: CurrentUser) -> HTMLResponse:
+async def home_teacher(request:Request, current_user: CurrentUser) -> HTMLResponse:
     """
     Main view for teacher
     """
@@ -41,6 +43,31 @@ async def teacher_home(request:Request, current_user: CurrentUser) -> HTMLRespon
         return response
     else:
         raise HTTPException(status_code=401, detail="Not authorized")
+
+@router.get("/page/{view}")
+async def page_teacher(view: str, request:Request, current_user: CurrentUser) -> HTMLResponse:
+    """
+    Main view for pages
+    """
+    start_time = time.time()
+    elapsed_time = lambda: time.time() - start_time
+    content_path="app/content/"
+
+    if os.path.exists(os.path.join(content_path,f"{view}.md")):
+        content = open(os.path.join(content_path,f"{view}.md")).read()
+        md = markdown.Markdown(extensions=['meta','tables'])
+        content= md.convert(content)
+        response=templates.TemplateResponse(
+            request=request, 
+            name="teacher/page.html", 
+            context={
+                "current_user":current_user,
+                "content":content,
+                "metadata":md.Meta,
+                "elapsed_time_seconds":f"{elapsed_time():2.3f}"})        
+        return response
+    else:
+        raise HTTPException(status_code=404, detail="Page not found")
 
 @router.get("/{course_id}/list")
 async def list_teacher(course_id:str, request: Request, current_user: CurrentUser) -> HTMLResponse:
