@@ -16,11 +16,8 @@
   <header>
   <nav class="navbar" role="navigation" aria-label="main navigation"o>
   <div class="navbar-brand">
-    <a class="navbar-item" href="{{url_for('index')}}">
-        <i class="fi-xnsuxl-house-solid"></i>
-    </a>
-
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+    {% block brand %}{% endblock %}
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>

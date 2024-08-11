@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{%block brand %}
+<a class="navbar-item" href="{{url_for('home_teacher')}}">
+        <i class="fi-xnsuxl-house-solid"></i>
+    </a>
+{%endblock%}
+
 {%block menu %}
 <a class="navbar-item" href="{{url_for('page_teacher',view='descripcion')}}">
         Información
