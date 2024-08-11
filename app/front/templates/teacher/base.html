@@ -4,7 +4,7 @@
 	<div class="navbar-item">
         <div class="buttons">
 		{% if current_user %}
-          <a class="button is-primary" href="{{url_for('logout')}}">
+          <a class="button is-warning" href="{{url_for('logout')}}">
               Salir
           </a>
 		{% endif %}
@@ -15,10 +15,7 @@
 
 {% block header %}
     <p class="title">
-        Bienvenido al sitio de LFyA
-    </p>
-    <p class="subtitle">
-        Ingresa al sitio para ver las opciones como profesor.
+      Lenguajes Formales y Autómatas
     </p>
 {% endblock %}
 

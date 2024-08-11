@@ -1,12 +1,16 @@
-{% extends 'admin/base.html' %}
+{% extends 'teacher/base.html' %}
 
 {% block title %}
+Profesor - Listas de assistencias
+{% endblock %}
+
+{% block subheader %}
 Listas de assistencias
 {% endblock %}
 
 {% block content %}
 
-<h1>Crear lista de assistencias</h1>
+<h1>Crear día de clases</h1>
 
 <form hx-post="{{url_for('attendance_create_api_teacher',course_id=course_id)}}" hx-target="#day-list"  hx-swap="afterbegin" hx-indicator="#indicator_attendance"> 
     {{ form.csrf_token }}
@@ -25,9 +29,9 @@ Listas de assistencias
         </div>
     </div>
 </form>
-<img width="48" id="indicator_attendance" class="htmx-indicator" src="{#{ url_for('static', filename='spinner.svg') }#}"/>
+<img width="48" id="indicator_attendance" class="htmx-indicator" src="{{ url_for('static', path='90-ring.svg') }}"/>
 
-<h1>Dias de clase</h1>
+<h1>Días de asistencias</h1>
 <ul id="day-list">
     {% for d,h in days %}
     <li><a href="{{url_for('attendance_modify_teacher',course_id=course_id, date=d)}}">{{h}}</a></li>

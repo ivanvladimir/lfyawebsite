@@ -81,7 +81,6 @@ async def attendance_list_teacher(course_id:str, request: Request, current_user:
                 "form":form,
                 "course_id":course_id,
                 "course_id_":course.id,
-                "current_user":current_user,
                 "elapsed_time_seconds":f"{elapsed_time():2.3f}"}
         )
         return response
@@ -103,8 +102,8 @@ async def attendance_modify_teacher(course_id:str, date:str, request: Request, c
                 "students":students,
                 "course_id":course_id,
                 "course_id_":course.id,
-                "current_user":current_user,
                 "elapsed_time_seconds":f"{elapsed_time():2.3f}"}
         )
         return response
     return "401", "Not authorized"
+

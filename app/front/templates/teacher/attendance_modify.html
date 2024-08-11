@@ -1,23 +1,40 @@
 {% extends 'teacher/base.html' %}
 
 {% block title %}
-Modificar asistencia
+Asentar asistencia
 {% endblock %}
+
+{% block subheader %}
+Asentar asistencia
+{% endblock %}
+
+
 
 {% block content %}
 
 <h1>Estudiantes</h1>
+<p>
+<div class="buttons">
+<div class="control">
+    <a class="button is-warning is-light" onclick="randomTable()">Orden aleatorio</a>
+</div>
+<div class="control">
+    <a class="button is-info is-light" onclick="" disabled>Orden ariginal</a>
+</div>
+</div>
+</p>
 
-<a class="button is-primary" onclick="randomTable()" >Random order</a>
-
+<p>
 <div class="field has-addons">
     <div class="control is-expanded">
-        <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombres" class="input is-primary">
+        <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombre" class="input is-primary">
     </div>
     <div class="control">
-        <button type="submit" onclick="cleanInput()"  class="button is-danger">Borrar</button>
+        <button type="submit" onclick="cleanInput()"  class="button is-info">Limpiar</button>
     </div>
 </div>
+</p>
+
 <p>
 <table id="student_list" class="search_table">
     <thead>
@@ -35,8 +52,7 @@ Modificar asistencia
     <tr class="row">
         <td><a class="name"  href="">{{s.firstname}} {{s.lastname}}</a></td>
 <td><a class="button is-success {{'is-light' if not a.status=='present' else '' }}"
-hx-get="{{url_for('change_status_attendance_api_teacher',status='present',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
-            >Presente</a> </td>
+hx-get="{{url_for('change_status_attendance_api_teacher',status='present',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'>Presente</a> </td>
 <td><a class="button is-danger {{'is-light' if not a.status=='absent' else '' }}"
 hx-get="{{url_for('change_status_attendance_api_teacher',status='absent',attendance_id=a.id)}}" hx-target='#status-{{loop.index}}'
             >Ausente</a> </td>
@@ -49,13 +65,9 @@ hx-get="{{url_for('change_status_attendance_api_teacher',status='justified',atte
 <td id="status-{{loop.index}}">{{a.status | string}}</td>
     </tr>
     {% endfor %}
-    <!-- <tbody id="lista" hx-get="{#{url_for('api.attendance_list',course_id=course_id,date=date)}#}" hx-trigger="load" hx-indicator="#indicator_list"> -->
     </tbody>
-    <!-- <img width="48" id="indicator_list" class="htmx-indicator" src="{#{ url_for('static', filename='spinner.svg') }#}"/ > -->
-
 </table>
 </p>
-
 
 <script>
     function filterByName() {

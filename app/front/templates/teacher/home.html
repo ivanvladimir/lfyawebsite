@@ -1,7 +1,11 @@
-{% extends 'admin/base.html' %}
+{% extends 'teacher/base.html' %}
 
 {% block title %}
-Profesor
+Profesor - Cursos
+{% endblock %}
+
+{% block subheader %}
+Cursos
 {% endblock %}
 
 {% block content %}
@@ -9,7 +13,6 @@ Profesor
 <h1>Grupos</h1>
 
 <p>
-
 <ul>
     {% for g in groups %}
     <li><a href="{{url_for('list_teacher',course_id=g.course_id)}}">{{g.course_id}}</a></li>

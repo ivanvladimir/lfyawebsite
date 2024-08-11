@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
     <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
     <script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     {% block extra_links %}{% endblock %}
 </head>
 <body>
@@ -59,7 +60,10 @@
 </nav>
 <section class="hero is-primary">
   <div class="hero-body">
+  <div class="column is-half is-offset-1">
   {% block header %}{% endblock %}
+  {% block subheader %}{% endblock %}
+  </div>
   </div>
 </section>
 </header>
