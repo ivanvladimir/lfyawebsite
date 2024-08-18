@@ -75,6 +75,7 @@ async def list_teacher(course_id:str, request: Request, current_user: CurrentUse
     elapsed_time = lambda: time.time() - start_time
     if current_user.role is UserEnum.teacher:
         students,course = await crud.get_students_from_course(course_id) 
+        students = [s for s in students if s[0].active]
         students = sorted(students, key=lambda s: s[0].firstname)
         response=templates.TemplateResponse(
             request=request,
@@ -121,6 +122,7 @@ async def attendance_modify_teacher(course_id:str, date:str, request: Request, c
     if current_user.role is UserEnum.teacher:
 
         students, course = await crud.get_students_from_course_date(course_id,date)
+        students = [s for s in students if s[0].active]
 
         response=templates.TemplateResponse(
             request=request,
