@@ -10,11 +10,27 @@ Profesor
 
 <p>
 
-<ul>
+<table class="table">
+    <thead>
+    <tr>
+    <th>Curso</th>
+    <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for g in groups %}
-    <li><a href="{{url_for('list_teacher',course_id=g.course_id)}}">{{g.course_id}}</a></li>
+    <tr>
+        <td>
+        <a href="{{url_for('list_teacher',course_id=g.course_id)}}">{{g.course_id}}</a>
+        </td>
+        <td>
+        <a href="{{url_for('course_modify_teacher',course_id=g.course_id)}}"><i class="fi-xnsuxl-settings-solid"></i></a>
+        </td>
+
+    </tr>
     {% endfor %}
-</ul>
+    </tbody>
+</table>
 </p>
 
 {% endblock %}

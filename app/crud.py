@@ -59,7 +59,7 @@ async def get_students_from_course(course_id: str) -> List[User]:
     student_ids = course_student_collection.find({"course": str(course.id)})
     course_student_info = {ObjectId(student_info['student']):student_info for student_info in await student_ids.to_list(100) }
     students = user_collection.find({"_id": {"$in": [k for k in course_student_info.keys()]}})
-    return [ (dict2user(s),course_student_info[s["_id"]]['participation'],course_student_info[s["_id"]]['_id']) for s in await students.to_list(100)], course
+    return [ (dict2user(s),course_student_info[s["_id"]]['participation'],course_student_info[s["_id"]]['_id']) for s in await students.to_list(100)] , course
 
 async def get_students_from_course_date(course_id: str, date: str) -> List[User]:
     date = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
@@ -90,11 +90,37 @@ async def authenticate(secret_url:str) -> User | None:
     else:
         return None
 
-async def get_student(course_student_id: str) -> Any:
-    return await course_student_collection.find_one({"_id": str(course_student_id)})
+async def create_student(student: User, course_id: str = None) -> Any:
+    res = await user_collection.insert_one(student.model_dump())
+    res = await user_collection.find_one({"_id":res.inserted_id})
+    
+    student = dict2user(res)
+    if course_id:
+        course = await get_course(course_id)
+        res2 = await course_student_collection.insert_one({
+            "course":str(course.id),
+            "participation":0,
+            "student":str(student.id),
+            "created":student.created,
+            "modified":student.modified
+        })
+    return dict2user(res)
 
-async def update_student(course_student_update) -> Any:
-    return await course_student_collection.find_one({"_id": str(course_student_update)})
+async def get_student(student_id: str) -> Any:
+    res = await user_collection.find_one({
+        "_id": ObjectId(student_id),
+        "role": UserEnum.student})
+    return dict2user(res)
+
+async def update_student(student_id,student_update) -> Any:
+    return await user_collection.update_one(
+        {"_id":ObjectId(student_id)},
+        {"$set": student_update})
+
+async def get_course(course_id: str) -> Any:
+    res = await course_collection.find_one({
+        "course_id": course_id})
+    return dict2course(res)
 
 async def get_course_student(course_student_id: str) -> Any:
     res= await course_student_collection.find_one(

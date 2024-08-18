@@ -19,18 +19,17 @@ class AttendanceEnum(str, Enum):
     late = "late"
     absent = "absent"
 
-
 class User(BaseModel):
     id: Optional[PydanticObjectId] = None
     role: UserEnum
-    idunam: Optional[str]
-    email: Optional[str]
+    idunam: Optional[str] = None
+    email: Optional[str] = None
     lastname: str
     firstname: str
-    prefered_name: Optional[str]
-    prefered_pronoun: Optional[str]
-    url: Optional[str]
-    password: Optional[str]
+    prefered_name: Optional[str] = None
+    prefered_pronoun: Optional[str] = None
+    url: Optional[str] = None
+    password: Optional[str] = None
     created: datetime
     modified: datetime
     active: bool = True

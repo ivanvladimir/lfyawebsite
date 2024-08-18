@@ -1,0 +1,88 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}
+Agregar estudiante
+{% endblock %}
+
+{% block subheader %}
+Agregar estudiante
+{% endblock %}
+
+{% block content %}
+
+<h1>Agrregar estudiante</h1>
+
+<form hx-post="{{url_for('add_student_api_teacher',course_id=course_id)}}" hx-target="#student_list"  hx-swap="afterbegin" hx-indicator="#indicator_attendance"> 
+    {{ form.csrf_token }}
+
+    <div class="field">
+        <label class="label">{{ form.idunam.label }}</label>
+        <div class="control has-icons-left has-icons-right">
+        {{ form.idunam(type='text') }}
+        <span class="icon is-small is-left">
+        <i class="fi-xwluxl-address-card-solid"></i>
+        </span>
+
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">{{ form.firstname.label }}</label>
+        <div class="control has-icons-left has-icons-right">
+        {{ form.firstname(type='text') }}
+        <span class="icon is-small is-left">
+        <i class="fi-xnsuxl-user-solid"></i>
+        </span>
+
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">{{ form.lastname.label }}</label>
+        <div class="control has-icons-left has-icons-right">
+        {{ form.lastname(type='text') }}
+        <span class="icon is-small is-left">
+        <i class="fi-xnluxl-user"></i>
+        </span>
+
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">{{ form.email.label }}</label>
+        <div class="control has-icons-left has-icons-right">
+        {{ form.email(type='email') }}
+        <span class="icon is-small is-left">
+          <i class="fi-xwsuxl-envelope-solid"></i>
+        </span>
+        </div>
+    </div>
+
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button 
+                id="send-button" type="submit" value="send" class="button is-link">Agregar</button>
+        </div>
+    </div>
+</form>
+<img width="48" id="indicator_attendance" class="htmx-indicator" src="{{ url_for('static', path='90-ring.svg') }}"/>
+
+<h1>Estudientes agregados</h1>
+ <table class="table">
+    <thead>
+    <tr>
+    <th>Activo</th>
+    <th>Nombre</th>
+    <th>Correo</th>
+    <th>No. cuenta</th>
+    <th>Pronombre preferido</th>
+    <th>Nombre preferido</th>
+    <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody id="student_list">
+    </tbody>
+</table>
+
+{% endblock %}

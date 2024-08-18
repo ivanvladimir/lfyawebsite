@@ -30,5 +30,5 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
-app.mount("/class", front_app)
+app.mount("/lfya", front_app)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

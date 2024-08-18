@@ -12,7 +12,6 @@ course_collection = db.courses
 attendance_collection = db.attendance
 
 async def attendance_unique_dates(course_id:str):
-    print(course_id)
     response= await db.command(SON(
         [
             ("distinct","attendance"),
@@ -20,7 +19,6 @@ async def attendance_unique_dates(course_id:str):
             ("query",{"course":course_id})
         ],
     ))
-    print(response)
     return response
 
     

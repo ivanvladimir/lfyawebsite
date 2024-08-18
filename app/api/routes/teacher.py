@@ -1,4 +1,5 @@
 import time
+import uuid
 import datetime
 import humanize
 from typing import Annotated, Any
@@ -11,7 +12,7 @@ from app.api.deps import CurrentUser
 from app.core import security
 from app.core import uptime
 from app.core.config import settings
-from app.models import Token, UserEnum, Attendance, AttendanceEnum
+from app.models import Token, UserEnum, Attendance, AttendanceEnum, User
 
 router = APIRouter()
 
@@ -99,6 +100,65 @@ async def change_status_attendance_api_teacher(status: str, attendance_id: str, 
         raise HTTPException(status_code=401, detail="Not authorized")
 
 
+@router.get("/switch/active/{student_id}")
+async def switch_active_teacher(student_id: str, request:Request, current_user: CurrentUser) -> str:
+    """
+    Switch user from active to not active, or viceversa
+    """
+    if current_user.role is UserEnum.teacher:
+        student = await crud.get_student(student_id)
+        student_ = { 
+            'active': False if student.active else True,
+            'modified':datetime.datetime.utcnow()
+        }
+        await crud.update_student(student.id,student_)
+        if student.active:
+            msg = f"<span>❌</span>"
+        else:
+            msg = f"<span class='has-text-success'>✔</span>"
+        return HTMLResponse(content=msg,status_code=200)
+    else:
+        raise HTTPException(status_code=401, detail="Not authorized")
+
+
+@router.post("/add_student/{course_id}")
+async def add_student_api_teacher(course_id: str, 
+                                        idunam: Annotated[str, Form()], 
+                                        firstname: Annotated[str, Form()], 
+                                        lastname: Annotated[str, Form()], 
+                                        email: Annotated[str, Form()], 
+                                        request:Request, current_user: CurrentUser, response_class=HTMLResponse) -> HTMLResponse:
+    """
+    Create user
+    """
+    if current_user.role is UserEnum.teacher:
+        gt = datetime.datetime.utcnow()
+        s = User(
+                role= UserEnum.student,
+                idunam=idunam.strip(),
+                firstname=firstname.upper().strip(),
+                lastname=lastname.upper().strip(),
+                email=email.strip(),
+                created=gt,
+                modified=gt,
+                url=str(uuid.uuid4()),
+                active=True,
+            )
+        result = await crud.create_student(s, course_id)
+        
+        msg= f""" <tr class="row">
+            <td>
+                { '<span class="has-text-success">✔</span>' if s.active else '<span>❌</span>'}
+            </td>
+            <td><a class="name" href="">{s.firstname} {s.lastname}</a></td>
+            <td>{s.email}</td>
+            <td>{s.idunam}</td>
+            <td>{s.prefered_pronoun}</td>
+            <td>{s.prefered_name}</td>
+    </tr>"""
+        return HTMLResponse(content=msg,status_code=200)
+    else:
+        raise HTTPException(status_code=401, detail="Not authorized")
 
 
 

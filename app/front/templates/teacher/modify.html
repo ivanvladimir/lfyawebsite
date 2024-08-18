@@ -1,0 +1,99 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}
+Estudiantes
+{% endblock %}
+
+{% block subheader %}
+Estudiantes
+{% endblock %}
+
+{% block content %}
+
+<h1>Acciones</h1>
+<center>
+    <a href="{{url_for('add_student_teacher',course_id=course_id)}}" class="button is-info">Agregar estudiante</a>
+</center>
+
+<hr/>
+
+<h1>Lista de estudiantes</h1>
+<div class="field has-addons">
+    <div class="control is-expanded">
+        <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombres" class="input is-primary">
+    </div>
+    <div class="control">
+        <button type="submit" onclick="cleanInput()"  class="button is-danger">Borrar</button>
+    </div>
+</div>
+<p>
+<table class="table">
+    <thead>
+    <tr>
+    <th>Activo</th>
+    <th>Nombre</th>
+    <th>Correo</th>
+    <th>No. cuenta</th>
+    <th>Pronombre preferido</th>
+    <th>Nombre preferido</th>
+    <th>Acciones</th>
+    <tbody id="searchable_bit">
+    {% for s,points,course_student_id in students %}
+    <tr class="row">
+            <td>
+              <a hx-get="{{url_for('switch_active_teacher',student_id=s.id)}}" hx-target="">
+                {% if s.active%}
+                  <span class="has-text-success">✔</span>
+                {% else %}
+                  <span>❌</span>
+                {% endif %}
+              </a>
+            </td>
+            <td><a class="name" href="">{{s.firstname}} {{s.lastname}}</a></td>
+            <td>{{s.email}}</td>
+            <td>{{s.idunam}}</td>
+            <td>{{s.prefered_pronoun}}</td>
+            <td>{{s.prefered_name}}</td>
+            <td>
+              <i class="fi-cwsuxl-plus-solid"></i>
+              <i class="fi-xnsuxl-trash-bin"></i>
+            </td>
+    <tr>
+    {% endfor %}
+    </tbody>
+</table>
+</p>
+
+<script>
+    function filterByName() {
+            // Declare variables
+            var input, filter, el, a, name, txtValue;
+            input = document.getElementById('search_table');
+            filter = input.value.toUpperCase();
+            elements = document.getElementsByClassName('row');
+
+            // Loop through all list items, and hide those who don't match the search query
+            for(var i = 0; i < elements.length; i++) {
+                var el = elements[i];
+                a=el.getElementsByClassName("name")[0];
+                name = a.textContents || a.innerText;
+                if (name.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+    }
+
+    function cleanInput() {
+            // Declare variables
+            var input;
+            input = document.getElementById('search_table');
+            input.value="";
+            filterByName();
+    }
+
+
+</script>
+
+{% endblock %}
