@@ -1,0 +1,58 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}
+Profesor - Listas de asignaciones
+{% endblock %}
+
+{% block subheader %}
+Listas de asignaciones
+{% endblock %}
+
+{% block content %}
+
+<h1>Crear día de clases</h1>
+
+<form hx-post="{{url_for('assigment_create_api_teacher',course_id=course_id)}}" hx-target="#assigment-list"  hx-swap="afterbegin" hx-indicator="#indicator_attendance"> 
+    {{ form.csrf_token }}
+
+    <div class="field">
+        <label class="label">{{ form.name.label }}</label>
+        <div class="control">
+        {{ form.name(type='text') }}
+        </div>
+    </div>
+
+    {% for problem in form.problems %}
+        <div class="columns">
+        <div class="column">
+        <label class="label">{{ problem.section.label }}</label>
+        <div class="control">
+        {{ problem.section(type='text') }}
+        </div>
+        </div>
+        <div class="column">
+        <label class="label">{{ problem.amount.label }}</label>
+        <div class="control">
+        {{ problem.amount(type='int') }}
+        </div>
+        </div>
+        </div>
+    {% endfor %}
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button 
+                id="send-button" type="submit" value="send" class="button is-link">Crear</button>
+        </div>
+    </div>
+</form>
+<img width="48" id="indicator_attendance" class="htmx-indicator" src="{{ url_for('static', path='90-ring.svg') }}"/>
+
+<h1>Asignaciones</h1>
+<ul id="assigment-list">
+    {% for name in assigments %}
+    <li><a href="{{url_for('assigment_list_teacher',course_id=course_id, name=name)}}">{{name}}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

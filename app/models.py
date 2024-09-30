@@ -93,6 +93,16 @@ class Attendance(BaseModel):
     created: datetime
     modified: datetime
 
+class Assigment(BaseModel):
+    id: Optional[PydanticObjectId] = None
+    student: str
+    course: str
+    name: str
+    sections: List[str]
+    assigments: List[int]
+    created: datetime
+    modified: datetime
+
 # Contents of JWT token
 class TokenPayload(BaseModel):
     subject: str | None = None

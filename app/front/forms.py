@@ -3,6 +3,26 @@ import wtforms
 from wtforms.validators	import DataRequired
 
 
+class ProblemEntryF(wtforms.Form):
+    section = wtforms.fields.StringField(
+        "Sección",
+        [wtforms.validators.DataRequired("Ingesar la sección")],
+        render_kw={"class": "input", "placeholder": "Insertar la sección"},
+    )
+    amount = wtforms.fields.IntegerField(
+        "Cantidad",
+        [wtforms.validators.DataRequired("Ingesar la cantidad de ejercicios")],
+        render_kw={"class": "input", "placeholder": "Insertar la cantidad"},
+    )
+ 
+class AssigmentF(StarletteForm):
+    name = wtforms.fields.StringField(
+        "Nombre de assingación",
+        [wtforms.validators.DataRequired("Ingesar el nombre")],
+        render_kw={"class": "input", "placeholder": "Insertar el nombre"},
+    )
+    problems = wtforms.fields.FieldList(wtforms.fields.FormField(ProblemEntryF),min_entries=1)
+
 class DateF(StarletteForm):
     date = wtforms.fields.DateField(
         "Fecha",

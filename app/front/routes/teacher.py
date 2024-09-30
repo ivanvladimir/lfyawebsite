@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 
 from app import crud
 from app.api.deps import CurrentUser
-from app.front.forms import DateF, UserF
+from app.front.forms import DateF, UserF, AssigmentF
 from app.core import security
 from app.core.config import settings
 #from app.core.security import get_password_hash
@@ -137,6 +137,59 @@ async def attendance_modify_teacher(course_id:str, date:str, request: Request, c
         )
         return response
     return "401", "Not authorized"
+
+@router.get("/{course_id}/assigment/list/{name}")
+async def assigment_list_teacher(course_id:str, name:str, request: Request, current_user: CurrentUser) -> HTMLResponse:
+    start_time = time.time()
+    elapsed_time = lambda: time.time() - start_time
+    if current_user.role is UserEnum.teacher:
+
+        students, course = await crud.get_students_from_course_assigment(course_id,name)
+        students = [s for s in students if s[0].active]
+        print(students[0])
+
+        response=templates.TemplateResponse(
+            request=request,
+            name="teacher/assigment_list.html",
+            context= {
+                "name":name,
+                "students":students,
+                "sections": students[0][1].sections,
+                "course_id":course_id,
+                "course_id_":course.id,
+                "current_user":current_user,
+                "elapsed_time_seconds":f"{elapsed_time():2.3f}"}
+        )
+        return response
+    return "401", "Not authorized"
+
+
+
+@router.get("/{course_id}/assigment")
+async def assigments_teacher(course_id:str, request: Request, current_user: CurrentUser) -> HTMLResponse:
+    start_time = time.time()
+    elapsed_time = lambda: time.time() - start_time
+    if current_user.role is UserEnum.teacher:
+        form = AssigmentF(request,
+                          problems=[{"section":"Uno","amount":5},{"section":"Dos","amount":5},{"section":"Tres","amount":5},{"section":"Cuatro","amount":5}])
+        assigments, course = await crud.get_assigments_course(course_id)
+        assigments = sorted(assigments,reverse=True)
+
+        response=templates.TemplateResponse(
+            request=request,
+            name="teacher/assigments.html",
+            context= {
+                "assigments":assigments,
+                "form":form,
+                "course_id":course_id,
+                "course_id_":course.id,
+                "current_user":current_user,
+                "elapsed_time_seconds":f"{elapsed_time():2.3f}"}
+        )
+        return response
+    return "401", "Not authorized"
+
+
 
 @router.get("/{course_id}")
 async def course_modify_teacher(course_id:str, request: Request, current_user: CurrentUser) -> HTMLResponse:

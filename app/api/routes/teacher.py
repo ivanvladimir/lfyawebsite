@@ -2,6 +2,7 @@ import time
 import uuid
 import datetime
 import humanize
+import random
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Request, HTTPException, Form
@@ -12,7 +13,7 @@ from app.api.deps import CurrentUser
 from app.core import security
 from app.core import uptime
 from app.core.config import settings
-from app.models import Token, UserEnum, Attendance, AttendanceEnum, User
+from app.models import Token, UserEnum, Attendance, AttendanceEnum, User, Assigment
 
 router = APIRouter()
 
@@ -76,6 +77,44 @@ async def attendance_create_api_teacher(course_id: str, date: Annotated[str, For
         result = await crud.add_attendances(atts)
         msg= f"<li><a href='/class/teacher/{course_id}/attendance/modify/{date_}'><strong>{date}</strong></a></li>"
         return HTMLResponse(content=msg,status_code=200)
+    else:
+        raise HTTPException(status_code=401, detail="Not authorized")
+
+@router.post("/assigment/create/{course_id}")
+async def assigment_create_api_teacher(course_id: str, request:Request, current_user: CurrentUser, response_class=HTMLResponse) -> HTMLResponse:
+    """
+    Create assiment for a class
+    """
+    if current_user.role is UserEnum.teacher:
+        assigment = dict(await request.form())
+        if await crud.exists_assigment_course(course_id=course_id,assigment=assigment['name']):
+            raise HTTPException(status_code=403, detail="Assigment already exists")
+        students,course = await crud.get_students_from_course(str(course_id))
+        
+        assigments =[]
+        for s,_,_ in students:
+            gt = datetime.datetime.utcnow()
+            assigments_=[]
+            sections_=[]
+            ini=0
+            num=len([k for k in assigment.keys() if k.endswith("amount")])
+            for problem in range(num):
+                assigments_.append(ini+random.choices(list(range(int(assigment[f"problems-{problem}-amount"]))))[0])
+                sections_.append(assigment[f"problems-{problem}-section"])
+                ini+=int(assigment[f"problems-{problem}-amount"])
+            att = Assigment(
+                student=str(s.id),
+                course=str(course.id),
+                assigments=assigments_,
+                name=assigment["name"],
+                sections=sections_,
+                created=gt,
+                modified=gt,
+            )
+            assigments.append(att)
+        result = await crud.add_assigments(assigments)
+        #msg= f"<li><a href='/class/teacher/{course_id}/attendance/modify/{date_}'><strong>{date}</strong></a></li>"
+        return HTMLResponse(content="<li>Hola</li>",status_code=200)
     else:
         raise HTTPException(status_code=401, detail="Not authorized")
 

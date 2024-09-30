@@ -4,8 +4,9 @@ from typing import Any, List
 
 from bson.objectid import ObjectId
 
-from app.models import User, UserEnum, Course, Attendance, AttendanceEnum
-from app.core.db import user_collection, course_student_collection, course_teacher_collection, course_collection, attendance_unique_dates, attendance_collection
+from app.models import User, UserEnum, Course, Attendance, AttendanceEnum, Assigment
+from app.core.db import user_collection, assigment_collection, course_student_collection, course_teacher_collection, course_collection, attendance_unique_dates, attendance_collection, assigments_course
+
 
 async def create_user(firstname: str, lastname:str, email:str, role: UserEnum)  -> User:
     dt = datetime.utcnow()
@@ -47,6 +48,11 @@ def dict2attendance(g:dict ) -> Attendance:
     g['id']=g['_id']
     return Attendance(**g)
 
+def dict2assigment(g:dict) -> Assigment:
+    g['id']=g['_id']
+    return Assigment(**g)
+
+
 async def get_groups_teacher(user: User) -> List[Course]:
     groups_ids = course_teacher_collection.find({"teacher": str(user.id)})
     groups = [await course_collection.find_one(ObjectId(g['course'])) 
@@ -72,11 +78,30 @@ async def get_students_from_course_date(course_id: str, date: str) -> List[User]
     student_attendance = attendance_collection.find({"date": date })
     return [ (students[ObjectId(s_a['student'])],dict2attendance(s_a)) for s_a in await student_attendance.to_list(100)], course 
 
+async def get_students_from_course_assigment(course_id: str, name: str) -> List[User]:
+    course = await course_collection.find_one({"course_id": course_id})
+    course = dict2course(course)
+    student_ids = course_student_collection.find({"course": str(course.id)})
+    course_student_info = {ObjectId(student_info['student']):student_info for student_info in await student_ids.to_list(100) }
+    students = user_collection.find({"_id": {"$in": [k for k in course_student_info.keys()]}})
+    students = {s['_id']:dict2user(s) for s in await students.to_list(100)}
+    student_assigment = assigment_collection.find({"name": name })
+    return [ (students[ObjectId(s_a['student'])],dict2assigment(s_a)) for s_a in await student_assigment.to_list(100)], course 
+
+
+
+
 async def get_unique_dates_attendance_course(course_id: str) -> List[User]:
     course = await course_collection.find_one({"course_id": course_id})
     course = dict2course(course)
     dates = await attendance_unique_dates(str(course.id))
     return dates['values'], course
+
+async def get_assigments_course(course_id: str) -> List[User]:
+    course = await course_collection.find_one({"course_id": course_id})
+    course = dict2course(course)
+    assigments = await assigments_course(str(course.id))
+    return assigments['values'], course
 
 async def get_user_by_email(email: str) -> User | None:
     await user_collection.find_one({"email": email})
@@ -145,6 +170,17 @@ async def exists_date_course(course_id: str, date: str) -> Any:
         {"course": str(course.id),
          "date": date_})
     return True if res else False
+
+async def exists_assigment_course(course_id: str, assigment: str) -> Any:
+    course = await course_collection.find_one({"course_id": course_id})
+    course = dict2course(course)
+    res= await assigment_collection.find_one(
+        {"course": str(course.id),
+         "name": assigment})
+    return True if res else False
+
+async def add_assigments(atts : List[Assigment]) -> Any:
+    return await assigment_collection.insert_many([att.model_dump() for att in atts])
 
 async def add_attendances(atts : List[Attendance]) -> Any:
     return await attendance_collection.insert_many([att.model_dump() for att in atts])

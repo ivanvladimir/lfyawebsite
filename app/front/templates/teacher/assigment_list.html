@@ -1,0 +1,121 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}
+Asentar asistencia
+{% endblock %}
+
+{% block subheader %}
+Asentar asistencia
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Asignación: {{name}}</h1>
+<p>
+<div class="buttons">
+<div class="control">
+    <a class="button is-warning is-light" onclick="randomTable()">Orden aleatorio</a>
+</div>
+<div class="control">
+    <a class="button is-info is-light" onclick="" disabled>Orden ariginal</a>
+</div>
+</div>
+</p>
+
+<p>
+<div class="field has-addons">
+    <div class="control is-expanded">
+        <input type="text" id="search_table" onkeyup="filterByName()" placeholder="Busca por nombre" class="input is-primary">
+    </div>
+    <div class="control">
+        <button type="submit" onclick="cleanInput()"  class="button is-info">Limpiar</button>
+    </div>
+</div>
+</p>
+
+<p>
+<table id="student_list" class="search_table">
+    <thead>
+    <tr>
+    <th>Nombre</th>
+    {% for sec in sections %}
+        <th>{{sec}}</th>
+    {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {%for (s,problems) in students %}
+    <tr class="row">
+        <td><a class="name"  href="">{{s.firstname}} {{s.lastname}}</a></td>
+    {% for p in problems.assigments %}
+    <td>
+        {{p}}
+    </td>
+    {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</p>
+
+<script>
+    function filterByName() {
+            // Declare variables
+            var input, filter, el, a, name, txtValue;
+            input = document.getElementById('search_table');
+            filter = input.value.toUpperCase();
+            elements = document.getElementsByClassName('row');
+
+            // Loop through all list items, and hide those who don't match the search query
+            for(var i = 0; i < elements.length; i++) {
+                var el = elements[i];
+                a=el.getElementsByClassName("name")[0];
+                name = a.textContents || a.innerText;
+                if (name.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+    }
+
+    function randomTable() {
+          let table = document.getElementById("student_list");
+
+          //1. get all rows
+          let rowsCollection = table.querySelectorAll("tr");
+
+          //2. convert to array
+          let rows = Array.from(rowsCollection)
+            .slice(1); //skip the header row
+
+          //3. shuffle
+          shuffleArray(rows);
+
+          //4. add back to the DOM
+          for (const row of rows) {
+                  table.appendChild(row);
+                }
+    }
+
+    const shuffleArray = array => {
+          for (let i = array.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  const temp = array[i];
+                  array[i] = array[j];
+                  array[j] = temp;
+                }
+    }
+
+    function cleanInput() {
+            // Declare variables
+            var input;
+            input = document.getElementById('search_table');
+            input.value="";
+            filterByName();
+    }
+
+</script>
+
+{% endblock %}
