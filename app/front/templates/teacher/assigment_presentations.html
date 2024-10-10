@@ -1,27 +1,36 @@
 {% extends 'teacher/base.html' %}
 
 {% block title %}
-Asentar asistencia
+Asignar presentaciones
 {% endblock %}
 
 {% block subheader %}
-Asentar asistencia
+Asentar presentaciones
 {% endblock %}
 
 
 {% block content %}
 
 <h1>Asignación: {{name}}</h1>
-<p>
-<div class="buttons">
-<div class="control">
-    <a class="button is-warning is-light" onclick="randomTable()">Orden aleatorio</a>
-</div>
-<div class="control">
-    <a class="button is-info is-light" onclick="" disabled>Orden original</a>
-</div>
-</div>
-</p>
+
+<form hx-post="{{url_for('assigment_presentation_api_teacher',course_id=course_id, name=name)}}" hx-target="#assigment-presentation"  hx-indicator="#indicator_attendance"> 
+    {{ form.csrf_token }}
+
+    <div class="field">
+        <label class="label">{{ form.talks.label }}</label>
+        <div class="control">
+        {{ form.talks(type="text") }}
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button 
+                id="send-button" type="submit" value="send" class="button is-link">Asignar</button>
+        </div>
+    </div>
+</form>
+<img width="48" id="indicator_attendance" class="htmx-indicator" src="{{ url_for('static', path='90-ring.svg') }}"/>
 
 <p>
 <div class="field has-addons">
@@ -37,24 +46,10 @@ Asentar asistencia
 <p>
 <table id="student_list" class="search_table">
     <thead>
-    <tr>
     <th>Nombre</th>
-    {% for sec in sections %}
-        <th>{{sec}}</th>
-    {% endfor %}
-    </tr>
+    <th>Presentación</th>
     </thead>
-    <tbody>
-    {%for (s,problems) in students %}
-    <tr class="row">
-        <td><a class="name"  href="">{{s.firstname}} {{s.lastname}}</a></td>
-    {% for p in problems.assigments %}
-    <td>
-        {{p+1}}
-    </td>
-    {% endfor %}
-    </tr>
-    {% endfor %}
+    <tbody id="assigment-presentation">
     </tbody>
 </table>
 </p>

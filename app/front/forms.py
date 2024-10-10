@@ -23,6 +23,13 @@ class AssigmentF(StarletteForm):
     )
     problems = wtforms.fields.FieldList(wtforms.fields.FormField(ProblemEntryF),min_entries=1)
 
+class PresentationF(StarletteForm):
+    talks = wtforms.fields.TextAreaField(
+        "Lista de presentaciones",
+        [wtforms.validators.DataRequired("Ingesar la lista de presentaciones")],
+        render_kw={"class": "input", "placeholder": "Lista de presentaciones", "rows": 40 },
+    )
+
 class DateF(StarletteForm):
     date = wtforms.fields.DateField(
         "Fecha",

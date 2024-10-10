@@ -3,6 +3,7 @@ import uuid
 import datetime
 import humanize
 import random
+import re
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Request, HTTPException, Form
@@ -117,6 +118,38 @@ async def assigment_create_api_teacher(course_id: str, request:Request, current_
         return HTMLResponse(content="<li>Hola</li>",status_code=200)
     else:
         raise HTTPException(status_code=401, detail="Not authorized")
+
+re_presentation=re.compile(r".*_(\d+)....$")
+@router.post("/assigment/presentation/create/{course_id}/{name}")
+async def assigment_presentation_api_teacher(course_id: str, name: str, talks: Annotated[str, Form()], request:Request, current_user: CurrentUser, response_class=HTMLResponse) -> HTMLResponse:
+    """
+    Create assiment for a class
+    """
+    if current_user.role is UserEnum.teacher:
+        students, course = await crud.get_students_from_course_assigment(course_id,name)
+        students = [s for s in students if s[0].active]
+        pres={}
+        for line in talks.split("\n"):
+            line=line.strip()
+            if len(line)==0:
+                continue
+            m=re_presentation.match(line)
+            if m:
+                if int(m.group(1))-1 in pres:
+                    pres[int(m.group(1))-1].append(line)
+                else:
+                    pres[int(m.group(1))-1]=[line]
+        rows=[]
+        for student,assigment in students:
+            options=[o for o in assigment.assigments if o in pres.keys()]
+            ass=random.choice(options)
+            pre=random.choice(pres[ass])
+            rows.append(f"<tr><td>{student.firstname} {student.lastname}</td><td>{pre}</td></tr>")
+
+        return HTMLResponse(content="\n".join(rows),status_code=200)
+    else:
+        raise HTTPException(status_code=401, detail="Not authorized")
+
 
 @router.get("/status/{status}/{attendance_id}")
 async def change_status_attendance_api_teacher(status: str, attendance_id: str, request:Request, current_user: CurrentUser, response_class=HTMLResponse) -> HTMLResponse:

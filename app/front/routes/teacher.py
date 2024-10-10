@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 
 from app import crud
 from app.api.deps import CurrentUser
-from app.front.forms import DateF, UserF, AssigmentF
+from app.front.forms import DateF, UserF, AssigmentF, PresentationF
 from app.core import security
 from app.core.config import settings
 #from app.core.security import get_password_hash
@@ -146,7 +146,6 @@ async def assigment_list_teacher(course_id:str, name:str, request: Request, curr
 
         students, course = await crud.get_students_from_course_assigment(course_id,name)
         students = [s for s in students if s[0].active]
-        print(students[0])
 
         response=templates.TemplateResponse(
             request=request,
@@ -162,6 +161,33 @@ async def assigment_list_teacher(course_id:str, name:str, request: Request, curr
         )
         return response
     return "401", "Not authorized"
+
+@router.get("/{course_id}/assigment/presentations/{name}")
+async def assigment_presentation_list_teacher(course_id:str, name:str, request: Request, current_user: CurrentUser) -> HTMLResponse:
+    start_time = time.time()
+    elapsed_time = lambda: time.time() - start_time
+    if current_user.role is UserEnum.teacher:
+        form = PresentationF(request)
+        
+        students, course = await crud.get_students_from_course_assigment(course_id,name)
+        students = [s for s in students if s[0].active]
+
+        response=templates.TemplateResponse(
+            request=request,
+            name="teacher/assigment_presentations.html",
+            context= {
+                "name":name,
+                "form":form,
+                "students":students,
+                "sections": students[0][1].sections,
+                "course_id":course_id,
+                "course_id_":course.id,
+                "current_user":current_user,
+                "elapsed_time_seconds":f"{elapsed_time():2.3f}"}
+        )
+        return response
+    return "401", "Not authorized"
+
 
 
 
