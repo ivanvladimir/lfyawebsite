@@ -52,8 +52,11 @@ def dict2assigment(g:dict) -> Assigment:
     g['id']=g['_id']
     return Assigment(**g)
 
+async def get_courses() -> list[Course]:
+    groups = course_collection.find({})
+    return [dict2course(g) async for g in groups]
 
-async def get_groups_teacher(user: User) -> List[Course]:
+async def get_groups_teacher(user: User) -> list[Course]:
     groups_ids = course_teacher_collection.find({"teacher": str(user.id)})
     groups = [await course_collection.find_one(ObjectId(g['course'])) 
         for g in await groups_ids.to_list(100)]
@@ -87,9 +90,6 @@ async def get_students_from_course_assigment(course_id: str, name: str) -> List[
     students = {s['_id']:dict2user(s) for s in await students.to_list(100)}
     student_assigment = assigment_collection.find({"name": name })
     return [ (students[ObjectId(s_a['student'])],dict2assigment(s_a)) for s_a in await student_assigment.to_list(100)], course 
-
-
-
 
 async def get_unique_dates_attendance_course(course_id: str) -> List[User]:
     course = await course_collection.find_one({"course_id": course_id})
@@ -130,6 +130,10 @@ async def create_student(student: User, course_id: str = None) -> Any:
             "modified":student.modified
         })
     return dict2user(res)
+
+async def create_course(course: Course) -> Any:
+    res = await course_collection.insert_one(course.model_dump())
+    return dict2course(res)
 
 async def get_student(student_id: str) -> Any:
     res = await user_collection.find_one({

@@ -20,6 +20,7 @@ pydantic-mongo = "^2.3.0"
 starlette-wtf = "^0.4.5"
 humanize = "^4.10.0"
 markdown = "^3.6"
+typer = "^0.15.1"
 
 
 [build-system]

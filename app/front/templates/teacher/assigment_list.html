@@ -59,6 +59,23 @@ Asentar asistencia
 </table>
 </p>
 
+
+<h2>Asignación raw</h2>
+<p>
+    <table>
+    {%for (s,problems) in students %}
+    <tr class="row">
+    <td>{{loop.index-1}}
+    {% for p in problems.assigments %}
+        ,{{p}}
+    {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+    </table>
+</p>
+
+
 <script>
     function filterByName() {
             // Declare variables

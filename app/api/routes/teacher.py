@@ -98,7 +98,7 @@ async def assigment_create_api_teacher(course_id: str, request:Request, current_
             assigments_=[]
             sections_=[]
             ini=0
-            num=len([k for k in assigment.keys() if k.endswith("amount")])
+            num=len([k for k,v in assigment.items() if k.endswith("amount") and int(v)>0])
             for problem in range(num):
                 assigments_.append(ini+random.choices(list(range(int(assigment[f"problems-{problem}-amount"]))))[0])
                 sections_.append(assigment[f"problems-{problem}-section"])
