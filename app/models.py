@@ -57,12 +57,6 @@ class Course(BaseModel):
     semester: str
     created: datetime
     modified: datetime
-    info: Optional[str]
-    links: Optional[dict]
-    starting_date: Optional[date]
-    finishes_date: Optional[date]
-    starting_time: Optional[time]
-    finishin_time: Optional[time]
     active: bool = True
 
 class CourseTeacher(BaseModel):
