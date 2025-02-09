@@ -1,5 +1,5 @@
 import uuid
-import datetime
+from datetime import datetime
 from typing import Any, List
 
 from bson.objectid import ObjectId
@@ -37,6 +37,8 @@ async def get_user(user_id:str) -> User | None:
     return user
 
 def dict2course(g:dict ) -> Course:
+    if not g:
+        return g
     g['id']=g['_id']
     return Course(**g)
 
@@ -55,6 +57,11 @@ def dict2assigment(g:dict) -> Assigment:
 async def get_courses() -> list[Course]:
     groups = course_collection.find({})
     return [dict2course(g) async for g in groups]
+
+async def get_course(course_id: str) -> Course:
+    res = await course_collection.find_one({
+        "course_id": course_id})
+    return dict2course(res)
 
 async def get_groups_teacher(user: User) -> list[Course]:
     groups_ids = course_teacher_collection.find({"teacher": str(user.id)})
@@ -115,6 +122,25 @@ async def authenticate(secret_url:str) -> User | None:
     else:
         return None
 
+async def create_students(students: List[User], course_id: str = None) -> Any:
+    res = await user_collection.insert_many([s.model_dump() for s in students])
+    course = await get_course(course_id)
+    dt = datetime.utcnow()
+    res2 = await course_student_collection.insert_many([
+        {
+            "course":str(course.id),
+            "participation":0,
+            "student":str(student_id),
+            "created":dt,
+            "modified":dt
+        } for student_id in res.inserted_ids
+
+    ])
+
+    return course
+
+
+
 async def create_student(student: User, course_id: str = None) -> Any:
     res = await user_collection.insert_one(student.model_dump())
     res = await user_collection.find_one({"_id":res.inserted_id})
@@ -145,11 +171,6 @@ async def update_student(student_id,student_update) -> Any:
     return await user_collection.update_one(
         {"_id":ObjectId(student_id)},
         {"$set": student_update})
-
-async def get_course(course_id: str) -> Any:
-    res = await course_collection.find_one({
-        "course_id": course_id})
-    return dict2course(res)
 
 async def get_course_student(course_student_id: str) -> Any:
     res= await course_student_collection.find_one(
