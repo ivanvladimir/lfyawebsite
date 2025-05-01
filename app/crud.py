@@ -78,7 +78,7 @@ async def get_students_from_course(course_id: str) -> List[User]:
     return [ (dict2user(s),course_student_info[s["_id"]]['participation'],course_student_info[s["_id"]]['_id']) for s in await students.to_list(100)] , course
 
 async def get_students_from_course_date(course_id: str, date: str) -> List[User]:
-    date = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     course = await course_collection.find_one({"course_id": course_id})
     course = dict2course(course)
     student_ids = course_student_collection.find({"course": str(course.id)})
@@ -95,7 +95,7 @@ async def get_students_from_course_assigment(course_id: str, name: str) -> List[
     course_student_info = {ObjectId(student_info['student']):student_info for student_info in await student_ids.to_list(100) }
     students = user_collection.find({"_id": {"$in": [k for k in course_student_info.keys()]}})
     students = {s['_id']:dict2user(s) for s in await students.to_list(100)}
-    student_assigment = assigment_collection.find({"name": name })
+    student_assigment = assigment_collection.find({"name": name, 'course': str(course.id)})
     return [ (students[ObjectId(s_a['student'])],dict2assigment(s_a)) for s_a in await student_assigment.to_list(100)], course 
 
 async def get_unique_dates_attendance_course(course_id: str) -> List[User]:
@@ -188,7 +188,7 @@ async def get_course_student_date(course_student_id: str, date: str) -> Any:
     return res
 
 async def exists_date_course(course_id: str, date: str) -> Any:
-    date_=datetime.datetime.strptime(date, "%d/%m/%Y")
+    date_=datetime.strptime(date, "%d/%m/%Y")
     course = await course_collection.find_one({"course_id": course_id})
     course = dict2course(course)
     res= await attendance_collection.find_one(
